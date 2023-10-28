@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface DocumentService {
     List<DocumentDto> getActualDocuments(String icp);
+    List<DocumentDto> getNotActualDocuments(String icp);
+
 }
