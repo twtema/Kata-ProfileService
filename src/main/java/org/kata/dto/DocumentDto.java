@@ -26,4 +26,5 @@ public class DocumentDto {
 
     private Date expirationDate;
 
+    private boolean actual;
 }

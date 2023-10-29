@@ -17,15 +17,11 @@ import java.util.List;
 public class DocumentController {
     private final DocumentService documentService;
 
-    @GetMapping("/getActual")
-    public ResponseEntity<List<DocumentDto>> getActualDocuments(@RequestParam String icp) {
-        return new ResponseEntity<>(documentService.getActualDocuments(icp), HttpStatus.OK);
+    @GetMapping("/getAll")
+    public ResponseEntity<List<DocumentDto>> getAllDocuments(@RequestParam String icp) {
+        return new ResponseEntity<>(documentService.getAllDocuments(icp), HttpStatus.OK);
     }
 
-    @GetMapping("/getNotActual")
-    public ResponseEntity<List<DocumentDto>> getNotActualDocuments(@RequestParam String icp) {
-        return new ResponseEntity<>(documentService.getNotActualDocuments(icp), HttpStatus.OK);
-    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(DocumentsNotFoundException.class)

@@ -24,28 +24,10 @@ public class DocumentServiceImpl implements DocumentService {
         this.loaderWebClient = WebClient.create(urlProperties.getProfileLoaderBaseUrl());
     }
 
-    public List<DocumentDto> getActualDocuments(String icp) {
+    public List<DocumentDto> getAllDocuments(String icp) {
         return loaderWebClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(urlProperties.getProfileLoaderGetActualDocuments())
-                        .queryParam("icp", icp)
-                        .build())
-                .retrieve()
-                .onStatus(HttpStatus::isError, response ->
-                        Mono.error(new DocumentsNotFoundException(
-                                "Documents with icp " + icp + " not found")
-                        )
-                )
-                .bodyToMono(new ParameterizedTypeReference<List<DocumentDto>>() {
-                })
-                .block();
-    }
-
-    @Override
-    public List<DocumentDto> getNotActualDocuments(String icp) {
-        return loaderWebClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(urlProperties.getProfileLoaderGetNotActualDocuments())
+                        .path(urlProperties.getProfileLoaderGetAllDocuments())
                         .queryParam("icp", icp)
                         .build())
                 .retrieve()
