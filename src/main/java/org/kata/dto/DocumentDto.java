@@ -18,7 +18,7 @@ public class DocumentDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String icp;
 
-    @Schema(description = "Тип документа")
+    @Schema(description = "Тип документа", implementation = DocumentType.class, example = "RF_PASSPORT")
     private DocumentType documentType;
 
     @Schema(description = "Номер документа", example = "1234567890")

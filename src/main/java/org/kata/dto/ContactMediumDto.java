@@ -17,7 +17,7 @@ public class ContactMediumDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String icp;
 
-    @Schema(description = "Контакт")
+    @Schema(description = "Контакты", implementation = ContactMediumType.class, example = "EMAIL")
     private ContactMediumType type;
 
     @Schema(description = "Значение", example = "contact@gmail.com")
