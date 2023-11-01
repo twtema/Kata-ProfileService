@@ -9,6 +9,7 @@ import org.kata.service.IndividualService;
 import org.kata.service.KafkaMessageSender;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -57,6 +58,32 @@ public class IndividualServiceImp implements IndividualService {
 //
 //Если у эталона не было документов, а у второго были,
 // они переносятся, если документы совпадают ничего не происходит(все остальные поля аналогично)
+
+    @Override
+    public void deduplication(String icporigin,
+                              String icpdedublication,
+                              String event_dedublication) {
+
+//   TODO
+//    # Проверка наличия клиентов по указанным параметрам
+//        client1 =
+//        client2 =
+//
+//
+//        # Проверка совпадения ФИО и даты рождения клиентов
+//
+//            # Объединение клиентов в одного
+//        merged client
+//            # Удаление второго клиента
+//        delete client(client2)
+//        else:
+
+//            # Логика для случая, когда ФИО и дата рождения не совпадают
+//            ...
+//    # Логика для случая, когда один из клиентов не найден
+//    ...
+
+    }
 
     public void createTestIndividual(int n) {
         IntStream.range(0, n)

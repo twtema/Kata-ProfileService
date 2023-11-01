@@ -41,7 +41,7 @@ public class IndividualController {
 //event_dedublication
 
     @PostMapping("/deduplication")
-    public ResponseEntity<IndividualDto> deduplication (@RequestParam String icporigin,
+    public ResponseEntity<IndividualDto> dedublication (@RequestParam String icporigin,
                                                         @RequestParam String icpdedublication,
                                                         @RequestParam String event_dedublication){
         return null;
