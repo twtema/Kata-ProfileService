@@ -9,7 +9,6 @@ import org.kata.service.IndividualService;
 import org.kata.service.KafkaMessageSender;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -68,16 +67,12 @@ public class IndividualServiceImp implements IndividualService {
 //    # Проверка наличия клиентов по указанным параметрам
 //        client1 =
 //        client2 =
-//
-//
 //        # Проверка совпадения ФИО и даты рождения клиентов
-//
-//            # Объединение клиентов в одного
+//           Объединение клиентов в одного
 //        merged client
 //            # Удаление второго клиента
 //        delete client(client2)
 //        else:
-
 //            # Логика для случая, когда ФИО и дата рождения не совпадают
 //            ...
 //    # Логика для случая, когда один из клиентов не найден
