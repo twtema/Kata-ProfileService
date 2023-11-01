@@ -34,4 +34,16 @@ public class IndividualController {
         return new ErrorMessage(e.getMessage());
     }
 
+    //в ProfileService
+// Должен быть post запрос с телом
+//icporigin
+//icpdedublication
+//event_dedublication
+
+    @PostMapping("/deduplication")
+    public ResponseEntity<IndividualDto> deduplication (@RequestParam String icporigin,
+                                                        @RequestParam String icpdedublication,
+                                                        @RequestParam String event_dedublication){
+        return null;
+    }
 }
