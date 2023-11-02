@@ -46,4 +46,6 @@ public class IndividualDto {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<AvatarDto> avatar;
+
+    private WalletDto wallet;
 }
