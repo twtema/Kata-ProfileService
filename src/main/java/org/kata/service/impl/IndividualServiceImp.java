@@ -1,17 +1,22 @@
 package org.kata.service.impl;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.extern.slf4j.Slf4j;
 import org.kata.config.UrlProperties;
-import org.kata.dto.IndividualDto;
+import org.kata.dto.*;
+import org.kata.dto.enums.GenderType;
 import org.kata.exception.IndividualNotFoundException;
 import org.kata.service.GenerateTestValue;
 import org.kata.service.IndividualService;
 import org.kata.service.KafkaMessageSender;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.Date;
+import java.util.List;
 import java.util.stream.IntStream;
 
 @Service
@@ -47,38 +52,69 @@ public class IndividualServiceImp implements IndividualService {
                 .block();
     }
 
-    //в ProfileService
-// Должен быть post запрос с телом
-//icporigin
-//icpdedublication
-//event_dedublication
-//В сервисе если оба клиента найдены происходит лога проверки пользователей,
-// если их ФИО и дата рождения совпадают, то клиенты объединяются в одного, второй удаляется
-//
-//Если у эталона не было документов, а у второго были,
-// они переносятся, если документы совпадают ничего не происходит(все остальные поля аналогично)
 
     @Override
     public void deduplication(String icporigin,
                               String icpdedublication,
                               String event_dedublication) {
 
-//   TODO
-//    # Проверка наличия клиентов по указанным параметрам
-//        client1 =
-//        client2 =
-//        # Проверка совпадения ФИО и даты рождения клиентов
-//           Объединение клиентов в одного
-//        merged client
-//            # Удаление второго клиента
-//        delete client(client2)
-//        else:
-//            # Логика для случая, когда ФИО и дата рождения не совпадают
-//            ...
-//    # Логика для случая, когда один из клиентов не найден
-//    ...
+        IndividualDto client1 = getIndividual(icporigin);
+        IndividualDto client2 = getIndividual(icpdedublication);
+        if (client1.getFullName().equals(client2.getFullName())) {
+            log.info("Client's full name matches");
+            if (client1.getBirthDate().equals(client2.getBirthDate())) {
+                log.info("Сlient's birthday coincides");
+                mergedIndividual(client1, client2);
+               // deleteIndividual(icpdedublication);
 
+            } else {
+                log.info("Сlient's birthday not coincides");
+            }
+        } else {
+            log.info("Client's full name does not match");
+        }
     }
+
+    private void deleteIndividual(String icp) {
+        loaderWebClient.delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(urlProperties.getProfileLoaderDeleteIndividual())
+                        .queryParam("icp", icp)
+                        .build())
+                .retrieve()
+                .onStatus(HttpStatus::isError, response ->
+                        Mono.error(new IndividualNotFoundException(
+                                "Individual with icp " + icp + " not found")
+                        )
+                );
+    }
+
+
+    private IndividualDto mergedIndividual(IndividualDto client1, IndividualDto client2) {
+        System.out.println(client1.toString());
+        String icp = client1.getIcp();
+        log.info("зашли в мердже");
+        client1.setAvatar(client2.getAvatar());
+        client1.setDocuments(client2.getDocuments());
+        client1.setAddress(client2.getAddress());
+        client1.setContacts(client2.getContacts());
+        client1.setIcp(icp);
+        System.out.println(client1.toString());
+        return loaderWebClient.put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(urlProperties.getProfileLoaderPostIndividual())
+                        .queryParam("dto", client1)
+                        .build())
+                .retrieve()
+                .onStatus(HttpStatus::isError, response ->
+                        Mono.error(new IndividualNotFoundException(
+                                "Individual with icp " + icp + " not found")
+                        )
+                )
+                .bodyToMono(IndividualDto.class)
+                .block();
+    }
+
 
     public void createTestIndividual(int n) {
         IntStream.range(0, n)

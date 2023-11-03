@@ -38,12 +38,13 @@ public class IndividualController {
 // Должен быть post запрос с телом
 //icporigin
 //icpdedublication
-//event_dedublication
+//event_dedublicatione
 
     @PostMapping("/deduplication")
-    public ResponseEntity<IndividualDto> dedublication (@RequestParam String icporigin,
+    public String dedublication (@RequestParam String icporigin,
                                                         @RequestParam String icpdedublication,
                                                         @RequestParam String event_dedublication){
-        return null;
+        individualService.deduplication(icporigin,icpdedublication,event_dedublication);
+        return "Success dedublication " + icporigin + "  and "+ icpdedublication + "Individual";
     }
 }
