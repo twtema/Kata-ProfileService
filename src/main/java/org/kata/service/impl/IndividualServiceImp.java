@@ -5,10 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.kata.config.UrlProperties;
 import org.kata.dto.*;
 import org.kata.dto.enums.GenderType;
+import org.kata.exception.DocumentsNotFoundException;
 import org.kata.exception.IndividualNotFoundException;
 import org.kata.service.GenerateTestValue;
 import org.kata.service.IndividualService;
 import org.kata.service.KafkaMessageSender;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -94,25 +96,45 @@ public class IndividualServiceImp implements IndividualService {
         System.out.println(client1.toString());
         String icp = client1.getIcp();
         log.info("зашли в мердже");
-        client1.setAvatar(client2.getAvatar());
-        client1.setDocuments(client2.getDocuments());
-        client1.setAddress(client2.getAddress());
-        client1.setContacts(client2.getContacts());
+        client1.getAvatar().addAll(client2.getAvatar());
+        client1.getDocuments().addAll(client2.getDocuments());
+        client1.getAddress().addAll(client2.getAddress());
+        client1.getContacts().addAll(client2.getContacts());
         client1.setIcp(icp);
+        client1.setPlaceOfBirth(client1.getPlaceOfBirth());
+        client1.setBirthDate(client2.getBirthDate());
+        client1.getFullName();
         System.out.println(client1.toString());
-        return loaderWebClient.put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(urlProperties.getProfileLoaderPostIndividual())
-                        .queryParam("dto", client1)
-                        .build())
-                .retrieve()
-                .onStatus(HttpStatus::isError, response ->
-                        Mono.error(new IndividualNotFoundException(
-                                "Individual with icp " + icp + " not found")
-                        )
-                )
-                .bodyToMono(IndividualDto.class)
-                .block();
+            loaderWebClient.put()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(urlProperties.getProfileLoaderUpdateIndividual())
+                            .queryParam("icp", client1.getIcp())
+                            .build())
+                    .body(Mono.just(client1), IndividualDto.class)
+                    .retrieve()
+                    .onStatus(HttpStatus::isError, response ->
+                            Mono.error(new DocumentsNotFoundException(
+                                    "Documents with icp " + client1.getIcp() + " not update")
+                            )
+                    )
+                    .bodyToMono(new ParameterizedTypeReference<List<DocumentDto>>() {
+                    })
+                    .block();
+            return getIndividual(client1.getIcp());
+//        }
+//        return loaderWebClient.post()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(urlProperties.getProfileLoaderPostIndividual())
+//                        .queryParam("dto", client1)
+//                        .build())
+//                .retrieve()
+//                .onStatus(HttpStatus::isError, response ->
+//                        Mono.error(new IndividualNotFoundException(
+//                                "Individual with icp " + icp + " not found")
+//                        )
+//                )
+//                .bodyToMono(IndividualDto.class)
+//                .block();
     }
 
 
