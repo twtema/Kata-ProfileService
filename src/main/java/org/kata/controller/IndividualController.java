@@ -37,11 +37,6 @@ public class IndividualController {
         return new ErrorMessage(e.getMessage());
     }
 
-    //в ProfileService
-// Должен быть post запрос с телом
-//icporigin
-//icpdedublication
-//event_dedublicatione
 
     @Operation(summary = "Dedeplication, merge Individual")
     @ApiResponses(value = {
