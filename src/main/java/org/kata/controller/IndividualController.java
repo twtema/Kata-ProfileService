@@ -1,5 +1,8 @@
 package org.kata.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.kata.dto.IndividualDto;
 import org.kata.exception.IndividualNotFoundException;
@@ -40,11 +43,17 @@ public class IndividualController {
 //icpdedublication
 //event_dedublicatione
 
+    @Operation(summary = "Dedeplication, merge Individual")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful deduplication"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/deduplication")
-    public String dedublication (@RequestParam String icporigin,
-                                                        @RequestParam String icpdedublication,
-                                                        @RequestParam String event_dedublication){
-        individualService.deduplication(icporigin,icpdedublication,event_dedublication);
-        return "Success dedublication " + icporigin + "  and "+ icpdedublication + "Individual";
+    public ResponseEntity<IndividualDto> dedublication(@RequestParam String icporigin,
+                                                       @RequestParam String icpdedublication,
+                                                       @RequestParam String event_dedublication) {
+        return new ResponseEntity<>(individualService.deduplication
+                (icporigin, icpdedublication, event_dedublication), HttpStatus.OK);
     }
 }
