@@ -1,24 +1,17 @@
 package org.kata.service.impl;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.extern.slf4j.Slf4j;
 import org.kata.config.UrlProperties;
 import org.kata.dto.*;
-import org.kata.dto.enums.GenderType;
-import org.kata.exception.DocumentsNotFoundException;
 import org.kata.exception.IndividualNotFoundException;
 import org.kata.service.GenerateTestValue;
 import org.kata.service.IndividualService;
 import org.kata.service.KafkaMessageSender;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.Date;
-import java.util.List;
 import java.util.stream.IntStream;
 
 @Service
@@ -56,18 +49,27 @@ public class IndividualServiceImp implements IndividualService {
 
 
     @Override
-    public void deduplication(String icporigin,
-                              String icpdedublication,
-                              String event_dedublication) {
+    public IndividualDto deduplication(String icporigin,
+                                       String icpdedublication,
+                                       String event_dedublication) {
 
         IndividualDto client1 = getIndividual(icporigin);
         IndividualDto client2 = getIndividual(icpdedublication);
-        if (client1.getFullName().equals(client2.getFullName())) {
+        // Проверка ФИО
+        if (client1.getName().equals(client2.getName())
+                && client1.getSurname().equals(client2.getSurname())
+                && client1.getPatronymic().equals(client2.getPatronymic())) {
             log.info("Client's full name matches");
+            // Проверка Дня рождения
             if (client1.getBirthDate().equals(client2.getBirthDate())) {
                 log.info("Сlient's birthday coincides");
-                mergedIndividual(client1, client2);
-               // deleteIndividual(icpdedublication);
+                // создаем Обьект  для слияния
+                IndividualDto mergedDto = mergedIndividual(client1, client2);
+                // Удаляем старые записи
+                deleteIndividual(icporigin);
+                deleteIndividual(icpdedublication);
+                // Создаем новую
+                updateIndividual(mergedDto);
 
             } else {
                 log.info("Сlient's birthday not coincides");
@@ -75,9 +77,28 @@ public class IndividualServiceImp implements IndividualService {
         } else {
             log.info("Client's full name does not match");
         }
+        return getIndividual(icporigin);
     }
 
+    public IndividualDto updateIndividual(IndividualDto dto) {
+        return loaderWebClient.post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(urlProperties.getProfileLoaderPostIndividual())
+                        .build())
+                .body(Mono.just(dto), IndividualDto.class)
+                .retrieve()
+                .onStatus(HttpStatus::isError, response ->
+                        Mono.error(new IndividualNotFoundException(
+                                "Individual with icp " + dto.getIcp() + " not update")
+                        )
+                )
+                .bodyToMono(IndividualDto.class)
+                .block();
+    }
+
+
     private void deleteIndividual(String icp) {
+        System.out.println(urlProperties.getProfileLoaderDeleteIndividual());
         loaderWebClient.delete()
                 .uri(uriBuilder -> uriBuilder
                         .path(urlProperties.getProfileLoaderDeleteIndividual())
@@ -88,7 +109,9 @@ public class IndividualServiceImp implements IndividualService {
                         Mono.error(new IndividualNotFoundException(
                                 "Individual with icp " + icp + " not found")
                         )
-                );
+                )
+                .bodyToMono(HttpStatus.class)
+                .block();
     }
 
 
@@ -96,45 +119,22 @@ public class IndividualServiceImp implements IndividualService {
         System.out.println(client1.toString());
         String icp = client1.getIcp();
         log.info("зашли в мердже");
-        client1.getAvatar().addAll(client2.getAvatar());
-        client1.getDocuments().addAll(client2.getDocuments());
-        client1.getAddress().addAll(client2.getAddress());
-        client1.getContacts().addAll(client2.getContacts());
-        client1.setIcp(icp);
-        client1.setPlaceOfBirth(client1.getPlaceOfBirth());
-        client1.setBirthDate(client2.getBirthDate());
-        client1.getFullName();
-        System.out.println(client1.toString());
-            loaderWebClient.put()
-                    .uri(uriBuilder -> uriBuilder
-                            .path(urlProperties.getProfileLoaderUpdateIndividual())
-                            .queryParam("icp", client1.getIcp())
-                            .build())
-                    .body(Mono.just(client1), IndividualDto.class)
-                    .retrieve()
-                    .onStatus(HttpStatus::isError, response ->
-                            Mono.error(new DocumentsNotFoundException(
-                                    "Documents with icp " + client1.getIcp() + " not update")
-                            )
-                    )
-                    .bodyToMono(new ParameterizedTypeReference<List<DocumentDto>>() {
-                    })
-                    .block();
-            return getIndividual(client1.getIcp());
-//        }
-//        return loaderWebClient.post()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(urlProperties.getProfileLoaderPostIndividual())
-//                        .queryParam("dto", client1)
-//                        .build())
-//                .retrieve()
-//                .onStatus(HttpStatus::isError, response ->
-//                        Mono.error(new IndividualNotFoundException(
-//                                "Individual with icp " + icp + " not found")
-//                        )
-//                )
-//                .bodyToMono(IndividualDto.class)
-//                .block();
+        IndividualDto mergedDto = client1;
+        // обьединяем списки
+        mergedDto.getAvatar().addAll(client2.getAvatar());
+        mergedDto.getDocuments().addAll(client2.getDocuments());
+        mergedDto.getAddress().addAll(client2.getAddress());
+        mergedDto.getContacts().addAll(client2.getContacts());
+        mergedDto.setPlaceOfBirth(client1.getPlaceOfBirth());
+        mergedDto.setBirthDate(client2.getBirthDate());
+
+        // убираем копии
+        mergedDto.setAddress(mergedDto.getAddress().stream().distinct().toList());
+        mergedDto.setAvatar(mergedDto.getAvatar().stream().distinct().toList());
+        mergedDto.setDocuments(mergedDto.getDocuments().stream().distinct().toList());
+        mergedDto.setContacts(mergedDto.getContacts().stream().distinct().toList());
+        System.out.println(mergedDto.toString());
+        return mergedDto;
     }
 
 

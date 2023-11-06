@@ -7,7 +7,7 @@ public interface IndividualService {
 
     void createTestIndividual(int n);
 
-//в ProfileService
+    //в ProfileService
 // Должен быть post запрос с телом
 //icporigin
 //icpdedublication
@@ -17,7 +17,10 @@ public interface IndividualService {
 //
 //Если у эталона не было документов, а у второго были,
 // они переносятся, если документы совпадают ничего не происходит(все остальные поля аналогично)
-public void deduplication(String icporigin,
-                          String icpdedublication,
-                          String event_dedublication);
+    public IndividualDto deduplication(String icporigin,
+                              String icpdedublication,
+                              String event_dedublication);
+    IndividualDto updateIndividual(IndividualDto dto);
+
+
 }
