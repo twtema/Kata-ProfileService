@@ -3,6 +3,7 @@ package org.kata.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.kata.config.UrlProperties;
 import org.kata.dto.*;
+import org.kata.dto.enums.EventType;
 import org.kata.exception.IndividualNotFoundException;
 import org.kata.service.GenerateTestValue;
 import org.kata.service.IndividualService;
@@ -13,6 +14,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.stream.IntStream;
+
+import static org.kata.dto.enums.EventType.DEDUPLICATION;
 
 @Service
 @Slf4j
@@ -50,13 +53,13 @@ public class IndividualServiceImp implements IndividualService {
     /**
      * This method merges the data of two clients.
      *
-     * @param icporigin The identifier of the first client.
-     * @param icpdedublication The identifier of the second client.
-     * @param event_dedublication The identifier of the merge event.
+     * @param icporigin           The identifier of the first client.
+     * @param icpdedublication    The identifier of the second client.
+     * @param  eventType The identifier of the merge event.
      * @return An object with the data of the first client after the merge.
      */
     @Override
-    public IndividualDto deduplication(String icporigin, String icpdedublication, String event_dedublication) {
+    public IndividualDto deduplication(String icporigin, String icpdedublication,EventType eventType) {
         // Retrieve data of the first client
         IndividualDto client1 = getIndividual(icporigin);
 
@@ -71,7 +74,7 @@ public class IndividualServiceImp implements IndividualService {
             // Check if the birth dates of the clients match
             if (client1.getBirthDate().equals(client2.getBirthDate())) {
                 log.info("Сlient's birthday coincides");
-
+            if (eventType == DEDUPLICATION) {
                 // Create a new object for merging the client data
                 IndividualDto mergedDto = mergedIndividual(client1, client2);
 
@@ -81,6 +84,7 @@ public class IndividualServiceImp implements IndividualService {
 
                 // Create a new record with the merged client data
                 updateIndividual(mergedDto);
+            }
             } else {
                 log.info("Сlient's birthday not coincides");
             }

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.kata.dto.IndividualDto;
+import org.kata.dto.enums.EventType;
 import org.kata.exception.IndividualNotFoundException;
 import org.kata.service.IndividualService;
 import org.springdoc.api.ErrorMessage;
@@ -47,8 +48,8 @@ public class IndividualController {
     @PostMapping("/deduplication")
     public ResponseEntity<IndividualDto> dedublication(@RequestParam String icporigin,
                                                        @RequestParam String icpdedublication,
-                                                       @RequestParam String event_dedublication) {
+                                                       @RequestParam EventType eventType) {
         return new ResponseEntity<>(individualService.deduplication
-                (icporigin, icpdedublication, event_dedublication), HttpStatus.OK);
+                (icporigin, icpdedublication, eventType), HttpStatus.OK);
     }
 }

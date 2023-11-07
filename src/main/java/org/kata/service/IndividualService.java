@@ -1,6 +1,7 @@
 package org.kata.service;
 
 import org.kata.dto.IndividualDto;
+import org.kata.dto.enums.EventType;
 
 public interface IndividualService {
     IndividualDto getIndividual(String icp);
@@ -19,7 +20,7 @@ public interface IndividualService {
 // они переносятся, если документы совпадают ничего не происходит(все остальные поля аналогично)
     public IndividualDto deduplication(String icporigin,
                               String icpdedublication,
-                              String event_dedublication);
+                              EventType eventType);
     IndividualDto updateIndividual(IndividualDto dto);
 
 
