@@ -1,0 +1,53 @@
+{
+  "icp": "100",
+  "name": "Valentin",
+  "surname": "Aufderhar",
+  "patronymic": "Bobby",
+  "fullName": "Trenton King",
+  "gender": "FEMALE",
+  "placeOfBirth": "kazan",
+  "countryOfBirth": "russia",
+  "birthDate": "2000-03-12T21:00:00.000+00:00",
+  "documents": [
+    {
+      "documentType": "FRGN_PASSPORT",
+      "documentNumber": "47801410",
+      "documentSerial": "3167",
+      "issueDate": "1988-02-05T21:00:00.000+00:00",
+      "expirationDate": "2023-11-07T21:00:00.000+00:00"
+    },
+
+    {
+      "documentType": "RF_DRIVING_LICENSE",
+      "documentNumber": "555555",
+      "documentSerial": "55-55",
+      "issueDate": "1998-09-01T20:00:00.000+00:00",
+      "expirationDate": "1998-09-01T20:00:00.000+00:00"
+    }
+  ],
+  "contacts": [
+    {
+      "type": "EMAIL",
+      "value": "renna.mckenzie@gmail.com"
+    },
+    {
+      "type": "PHONE",
+      "value": "1-162-726-5066 x42252"
+    },
+    {
+      "type": "PHONE",
+      "value": "1-5-555555555 "
+    }
+  ],
+  "address": [
+
+    {
+      "street": "lenina",
+      "city": "leningrad",
+      "state": "tatarstan",
+      "postCode": "423450",
+      "country": "Rossia"
+    }
+  ],
+  "avatar": []
+}

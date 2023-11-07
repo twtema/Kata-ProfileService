@@ -100,10 +100,9 @@ public class IndividualServiceImp implements IndividualService {
      * This method is used to update client data.
      *
      * @param dto An object with the new client data.
-     * @return An object with the updated client data.
      */
-    public IndividualDto updateIndividual(IndividualDto dto) {
-        return loaderWebClient.post()
+    private void updateIndividual(IndividualDto dto) {
+        loaderWebClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .path(urlProperties.getProfileLoaderPostIndividual())
                         .build())
@@ -123,8 +122,7 @@ public class IndividualServiceImp implements IndividualService {
      * @param icp The identifier of the client.
      */
     private void deleteIndividual(String icp) {
-        System.out.println(urlProperties.getProfileLoaderDeleteIndividual());
-
+        log.info("delete client, icp - " + icp);
         loaderWebClient.delete()
                 .uri(uriBuilder -> uriBuilder
                         .path(urlProperties.getProfileLoaderDeleteIndividual())
@@ -147,10 +145,8 @@ public class IndividualServiceImp implements IndividualService {
      * @return An object with the merged client data.
      */
     private IndividualDto mergedIndividual(IndividualDto client1, IndividualDto client2) {
-        System.out.println(client1.toString());
 
         String icp = client1.getIcp();
-        log.info("зашли в мердже");
 
         IndividualDto mergedDto = client1;
 
@@ -163,13 +159,14 @@ public class IndividualServiceImp implements IndividualService {
         mergedDto.setPlaceOfBirth(client1.getPlaceOfBirth());
         mergedDto.setBirthDate(client2.getBirthDate());
 
+        log.info("client merged");
+
         // Remove duplicate data
         mergedDto.setAddress(mergedDto.getAddress().stream().distinct().toList());
         mergedDto.setAvatar(mergedDto.getAvatar().stream().distinct().toList());
         mergedDto.setDocuments(mergedDto.getDocuments().stream().distinct().toList());
         mergedDto.setContacts(mergedDto.getContacts().stream().distinct().toList());
-
-        System.out.println(mergedDto.toString());
+        log.info("client removed duplicate data");
 
         return mergedDto;
     }
