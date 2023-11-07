@@ -39,7 +39,7 @@ public class IndividualController {
     }
 
 
-    @Operation(summary = "Dedeplication, merge Individual")
+    @Operation(summary = "Dedublication, merge Individual")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful deduplication"),
             @ApiResponse(responseCode = "400", description = "Bad request"),

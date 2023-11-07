@@ -1,6 +1,6 @@
 {
   "icp": "200",
-  "name": "Valentin",
+  "name": "Valentin11",
   "surname": "Aufderhar",
   "patronymic": "Bobby",
   "fullName": "Trenton King",
@@ -17,29 +17,35 @@
       "expirationDate": "2023-11-07T21:00:00.000+00:00"
     },
     {
-      "documentType": "RF_PASSPORT",
-      "documentNumber": "49243087",
-      "documentSerial": "2362",
+      "documentType": "RF_DRIVING_LICENSE",
+      "documentNumber": "555555",
+      "documentSerial": "55-55",
       "issueDate": "1998-09-01T20:00:00.000+00:00",
-      "expirationDate": "2023-11-08T21:00:00.000+00:00"
+      "expirationDate": "1998-09-01T20:00:00.000+00:00"
     }
   ],
   "contacts": [
-
+    {
+      "type": "EMAIL",
+      "value": "renna.mckenzie@gmail.com"
+    },
     {
       "type": "PHONE",
-      "value": "1-5-55558888855555 "
+      "value": "1-162-726-5066 x42252"
+    },
+    {
+      "type": "PHONE",
+      "value": "1-5-555555555 "
     }
   ],
   "address": [
     {
-      "street": "89579 Konopelski Points",
-      "city": "Port Humberto",
-      "state": "New Mexico",
-      "postCode": "90921",
-      "country": "Guinea"
+      "street": "lenina",
+      "city": "leningrad",
+      "state": "tatarstan",
+      "postCode": "423450",
+      "country": "Rossia"
     }
-
   ],
   "avatar": []
 }

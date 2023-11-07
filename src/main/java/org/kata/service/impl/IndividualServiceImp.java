@@ -53,13 +53,13 @@ public class IndividualServiceImp implements IndividualService {
     /**
      * This method merges the data of two clients.
      *
-     * @param icporigin           The identifier of the first client.
-     * @param icpdedublication    The identifier of the second client.
-     * @param  eventType The identifier of the merge event.
+     * @param icporigin        The identifier of the first client.
+     * @param icpdedublication The identifier of the second client.
+     * @param eventType        The identifier of the merge event.
      * @return An object with the data of the first client after the merge.
      */
     @Override
-    public IndividualDto deduplication(String icporigin, String icpdedublication,EventType eventType) {
+    public IndividualDto deduplication(String icporigin, String icpdedublication, EventType eventType) {
         // Retrieve data of the first client
         IndividualDto client1 = getIndividual(icporigin);
 
@@ -74,17 +74,17 @@ public class IndividualServiceImp implements IndividualService {
             // Check if the birth dates of the clients match
             if (client1.getBirthDate().equals(client2.getBirthDate())) {
                 log.info("Сlient's birthday coincides");
-            if (eventType == DEDUPLICATION) {
-                // Create a new object for merging the client data
-                IndividualDto mergedDto = mergedIndividual(client1, client2);
+                if (eventType == DEDUPLICATION) {
+                    // Create a new object for merging the client data
+                    IndividualDto mergedDto = mergedIndividual(client1, client2);
 
-                // Delete old client records
-                deleteIndividual(icporigin);
-                deleteIndividual(icpdedublication);
+                    // Delete old client records
+                    deleteIndividual(icporigin);
+                    deleteIndividual(icpdedublication);
 
-                // Create a new record with the merged client data
-                updateIndividual(mergedDto);
-            }
+                    // Create a new record with the merged client data
+                    updateIndividual(mergedDto);
+                }
             } else {
                 log.info("Сlient's birthday not coincides");
             }
@@ -101,7 +101,7 @@ public class IndividualServiceImp implements IndividualService {
      *
      * @param dto An object with the new client data.
      */
-    private void updateIndividual(IndividualDto dto) {
+    protected void updateIndividual(IndividualDto dto) {
         loaderWebClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .path(urlProperties.getProfileLoaderPostIndividual())
@@ -121,7 +121,7 @@ public class IndividualServiceImp implements IndividualService {
      *
      * @param icp The identifier of the client.
      */
-    private void deleteIndividual(String icp) {
+    protected void deleteIndividual(String icp) {
         log.info("delete client, icp - " + icp);
         loaderWebClient.delete()
                 .uri(uriBuilder -> uriBuilder
