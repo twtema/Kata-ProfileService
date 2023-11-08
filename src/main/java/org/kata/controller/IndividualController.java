@@ -93,7 +93,8 @@ public class IndividualController {
     })
     @GetMapping("/findByPhone")
     public ResponseEntity<IndividualDto> getIndividualByPhoneNumber(@RequestParam String phoneNumber) {
-        IndividualDto individual = individualService.getIndividualByPhoneNumber(phoneNumber);
+        String cleanedPhoneNumber = phoneNumber.replaceAll("x.*|[^0-9]", "");
+        IndividualDto individual = individualService.getIndividualByPhoneNumber(cleanedPhoneNumber);
         if (individual != null) {
             return new ResponseEntity<>(individual, HttpStatus.OK);
         } else {
