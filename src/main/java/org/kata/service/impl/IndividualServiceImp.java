@@ -47,6 +47,23 @@ public class IndividualServiceImp implements IndividualService {
                 .block();
     }
 
+    public IndividualDto getIndividualByPhoneNumber(String phoneNumber) {
+        return loaderWebClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(urlProperties.getProfileLoaderGetIndividualByPhoneNumber())
+                        .queryParam("phoneNumber", phoneNumber)
+                        .build())
+                .retrieve()
+                .onStatus(HttpStatus::isError, response ->
+                        Mono.error(new IndividualNotFoundException(
+                                "Individual with phone number " + phoneNumber + " not found")
+                        )
+                )
+                .bodyToMono(IndividualDto.class)
+                .block();
+
+    }
+
     public void createTestIndividual(int n) {
         IntStream.range(0, n)
                 .forEach(i -> {

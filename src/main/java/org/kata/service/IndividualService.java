@@ -6,4 +6,6 @@ public interface IndividualService {
     IndividualDto getIndividual(String icp);
 
     void createTestIndividual(int n);
+
+    IndividualDto getIndividualByPhoneNumber(String phoneNumber);
 }

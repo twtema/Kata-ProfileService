@@ -72,6 +72,35 @@ public class IndividualController {
         return "Success create " + n + "Individual, pls check Kafka and DB";
     }
 
+    @Operation(summary = "Get Individual by phone number")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Individual is found",
+                    content = @Content(
+                            mediaType = "Application/JSON",
+                            schema = @Schema(implementation = IndividualDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Individual is NOT found",
+                    content = @Content(
+                            mediaType = "Application/JSON",
+                            schema = @Schema(implementation = ErrorMessage.class)
+                    )
+            )
+    })
+    @GetMapping("/findByPhone")
+    public ResponseEntity<IndividualDto> getIndividualByPhoneNumber(@RequestParam String phoneNumber) {
+        IndividualDto individual = individualService.getIndividualByPhoneNumber(phoneNumber);
+        if (individual != null) {
+            return new ResponseEntity<>(individual, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IndividualNotFoundException.class)
     public ErrorMessage getIndividualHandler(IndividualNotFoundException e) {
