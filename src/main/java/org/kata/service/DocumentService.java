@@ -5,6 +5,7 @@ import org.kata.dto.DocumentDto;
 import java.util.List;
 
 public interface DocumentService {
-    List<DocumentDto> getAllDocuments(String icp);
+    List<DocumentDto> getActualDocuments(String icp);
+    List<DocumentDto> getNotActualDocuments(String icp);
 
 }
