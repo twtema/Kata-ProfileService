@@ -38,11 +38,12 @@ public class IndividualServiceImpTest {
         urlProperties.setProfileLoaderDeleteIndividual("v1/individual/delete");
         urlProperties.setProfileLoaderGetIndividual("v1/individual");
 
-        IndividualServiceImpTest r = new IndividualServiceImpTest();
-
-
         IndividualServiceImp individualService = new IndividualServiceImp(urlProperties, kafkaMessageSender, generateTestValue);
         ObjectMapper mapper = new ObjectMapper();
+
+        //тест
+        Assert.assertThrows(IndividualNotFoundException.class, () -> individualService.getIndividual("200"));
+        Assert.assertThrows(IndividualNotFoundException.class, () -> individualService.getIndividual("546-897"));
 
 
         // создание 1 клиента
@@ -51,7 +52,9 @@ public class IndividualServiceImpTest {
         IndividualDto dto1 = mapper.readValue(content, IndividualDto.class);
         log.info("Cчитали с файла клиент 1 - " + dto1);
         individualService.updateIndividual(dto1);
+        // Тест на правильнсть Имени
         Assert.assertEquals("Valentin11", individualService.getIndividual("100").getName());
+        // Тест на ошибку
         Assert.assertThrows(IndividualNotFoundException.class, () -> individualService.getIndividual("200"));
 
         // создание 2 клиента
@@ -60,7 +63,9 @@ public class IndividualServiceImpTest {
         IndividualDto dto2 = mapper.readValue(content, IndividualDto.class);
         log.info("Cчитали с файла клиент 2- " + dto2);
         individualService.updateIndividual(dto2);
+        // Тест на правильнсть Имени
         Assert.assertEquals("Valentin11", individualService.getIndividual("200").getName());
+        // Тест на ошибку
         Assert.assertThrows(IndividualNotFoundException.class, () -> individualService
                 .getIndividual("300"));
 
