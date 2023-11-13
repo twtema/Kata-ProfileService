@@ -1,14 +1,18 @@
 package org.kata.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.kata.dto.IndividualDto;
+import org.kata.exception.BadRequestException;
 import org.kata.exception.IndividualNotFoundException;
+import org.kata.mapper.util.TimeUtils;
 import org.kata.service.IndividualService;
 import org.springdoc.api.ErrorMessage;
 import org.springframework.http.HttpStatus;
@@ -45,6 +49,58 @@ public class IndividualController {
     @GetMapping
     public ResponseEntity<IndividualDto> getIndividual(@RequestParam String icp) {
         return new ResponseEntity<>(individualService.getIndividual(icp), HttpStatus.OK);
+    }
+    @Operation(
+            summary = "Get Individual by ICP or phone number",
+            description = "Get Individual Entity by ICP or phone number"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "The Individual is found",
+                    content = @Content(
+                            mediaType = "Application/JSON",
+                            schema = @Schema(implementation = IndividualDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "The Individual is NOT found",
+                    content = @Content(
+                            mediaType = "Application/JSON",
+                            schema = @Schema(implementation = ErrorMessage.class)
+                    )
+            )
+    })
+    @GetMapping("/getIndividualByIcpOrPhone")
+    public ResponseEntity<IndividualDto> getIndividualByIcpOrPhone(
+            @RequestParam(required = false) @Parameter(description = "User icp") String icp,
+            @RequestParam(required = false) @Parameter(description = "User phone") String phone
+    ) {
+        if ((StringUtils.isNotEmpty(icp) && StringUtils.isNotEmpty(phone)) ||
+                (StringUtils.isEmpty(icp) && StringUtils.isEmpty(phone))) {
+            throw new BadRequestException("Exactly one of the parameters (icp or phone) must be provided" +
+                    " - " +
+                    TimeUtils.getTime()
+            );
+        }
+        IndividualDto individual = icpOrPhone(icp, phone);
+        if (individual == null) {
+            throw new IndividualNotFoundException("Individual not found: icp = " + icp +
+                    " phone = " + phone + " - " +
+                    TimeUtils.getTime()
+            );
+        }
+        return ResponseEntity.ok(individual);
+    }
+    private IndividualDto icpOrPhone(String icp, String phone) {
+        IndividualDto individual = null;
+        if (StringUtils.isNotEmpty(phone)) {
+            individual = individualService.getIndividualByPhoneNumber(phone);
+        } else if (StringUtils.isNotEmpty(icp)) {
+            individual = individualService.getIndividual(icp);
+        }
+        return individual;
     }
 
     @Operation(summary = "Create random Individuals by n (count)")
@@ -91,16 +147,6 @@ public class IndividualController {
                     )
             )
     })
-    @GetMapping("/findByPhone")
-    public ResponseEntity<IndividualDto> getIndividualByPhoneNumber(@RequestParam String phoneNumber) {
-        String cleanedPhoneNumber = phoneNumber.replaceAll("x.*|[^0-9]", "");
-        IndividualDto individual = individualService.getIndividualByPhoneNumber(cleanedPhoneNumber);
-        if (individual != null) {
-            return new ResponseEntity<>(individual, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IndividualNotFoundException.class)
