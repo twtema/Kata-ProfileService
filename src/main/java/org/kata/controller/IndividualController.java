@@ -90,9 +90,9 @@ public class IndividualController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/deduplication")
-    public ResponseEntity<IndividualDto> dedublication(@RequestParam String icporigin,
-                                                       @RequestParam String icpdedublication,
-                                                       @RequestParam EventType eventType) {
+    public ResponseEntity<IndividualDto> dedublication(@RequestBody String icporigin,
+                                                       @RequestBody String icpdedublication,
+                                                       @RequestBody EventType eventType) {
         return new ResponseEntity<>(individualService.deduplication
                 (icporigin, icpdedublication, eventType), HttpStatus.OK);
     }
