@@ -170,8 +170,6 @@ public class IndividualServiceImp implements IndividualService {
      */
     private IndividualDto mergedIndividual(IndividualDto client1, IndividualDto client2) {
 
-        String icp = client1.getIcp();
-
         IndividualDto mergedDto = client1;
 
         // Merge the lists of client data
