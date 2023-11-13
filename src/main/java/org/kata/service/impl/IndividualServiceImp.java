@@ -69,17 +69,17 @@ public class IndividualServiceImp implements IndividualService {
         if (eventType.equals(DEDUPLICATION)) {
             log.info("EventType -DEDUPLICATION");
 
-            if (isIdentical(client1,client2)) {
+            if (isIdentical(client1, client2)) {
                 log.info("Сlient's identical");
-                    // Create a new object for merging the client data
-                    IndividualDto mergedDto = mergedIndividual(client1, client2);
+                // Create a new object for merging the client data
+                IndividualDto mergedDto = mergedIndividual(client1, client2);
 
-                    // Delete old client records
-                    deleteIndividual(icporigin);
-                    deleteIndividual(icpdedublication);
+                // Delete old client records
+                deleteIndividual(icporigin);
+                deleteIndividual(icpdedublication);
 
-                    // Create a new record with the merged client data
-                    updateIndividual(mergedDto);
+                // Create a new record with the merged client data
+                updateIndividual(mergedDto);
 
             } else {
                 log.info("Сlient's not identical");
@@ -100,9 +100,7 @@ public class IndividualServiceImp implements IndividualService {
      * @return true if the clients are identical, false otherwise
      */
     private boolean isIdentical(IndividualDto client1, IndividualDto client2) {
-        IdenticalIndividualDto dto1 = getIdentical(client1);
-        IdenticalIndividualDto dto2 = getIdentical(client2);
-        return dto1.equals(dto2);
+        return getIdentical(client1).equals(getIdentical(client2));
     }
 
     /**
@@ -170,27 +168,34 @@ public class IndividualServiceImp implements IndividualService {
      */
     private IndividualDto mergedIndividual(IndividualDto client1, IndividualDto client2) {
 
-        IndividualDto mergedDto = client1;
 
-        // Merge the lists of client data
-        mergedDto.getAvatar().addAll(client2.getAvatar());
-        mergedDto.getDocuments().addAll(client2.getDocuments());
-        mergedDto.getAddress().addAll(client2.getAddress());
-        mergedDto.getContacts().addAll(client2.getContacts());
+        try {
+            // Merge the lists of client data
+            client1.getAvatar().addAll(client2.getAvatar());
+            client1.getDocuments().addAll(client2.getDocuments());
+            client1.getAddress().addAll(client2.getAddress());
+            client1.getContacts().addAll(client2.getContacts());
 
-        mergedDto.setPlaceOfBirth(client1.getPlaceOfBirth());
-        mergedDto.setBirthDate(client2.getBirthDate());
+            // client1.setPlaceOfBirth(client1.getPlaceOfBirth());
+            client1.setBirthDate(client2.getBirthDate());
 
-        log.info("client merged");
+            log.info("client merged");
 
-        // Remove duplicate data
-        mergedDto.setAddress(mergedDto.getAddress().stream().distinct().toList());
-        mergedDto.setAvatar(mergedDto.getAvatar().stream().distinct().toList());
-        mergedDto.setDocuments(mergedDto.getDocuments().stream().distinct().toList());
-        mergedDto.setContacts(mergedDto.getContacts().stream().distinct().toList());
-        log.info("client removed duplicate data");
+            // Remove duplicate data
+            client1.setAddress(client1.getAddress().stream().distinct().toList());
+            client1.setAvatar(client1.getAvatar().stream().distinct().toList());
+            client1.setDocuments(client1.getDocuments().stream().distinct().toList());
+            client1.setContacts(client1.getContacts().stream().distinct().toList());
+            log.info("client removed duplicate data");
 
-        return mergedDto;
+
+        } catch (NullPointerException e) {
+            // обработка исключения, например, логирование ошибки
+            log.error("NullPointerException occurred during merging individual data: " + e.getMessage());
+            // возвращение пустого объекта или другое действие по усмотрению
+
+        }
+        return client1;
     }
 
     public void createTestIndividual(int n) {
