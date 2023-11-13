@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.kata.config.UrlProperties;
 import org.kata.dto.*;
 import org.kata.dto.enums.EventType;
+import org.kata.exception.IndividualMergeException;
 import org.kata.exception.IndividualNotFoundException;
 import org.kata.service.GenerateTestValue;
 import org.kata.service.IndividualService;
@@ -190,10 +191,8 @@ public class IndividualServiceImp implements IndividualService {
 
 
         } catch (NullPointerException e) {
-            // обработка исключения, например, логирование ошибки
-            log.error("NullPointerException occurred during merging individual data: " + e.getMessage());
-            // возвращение пустого объекта или другое действие по усмотрению
-
+            // обработка исключения,логирование ошибки
+            throw new IndividualMergeException(client1.getIcp());
         }
         return client1;
     }
