@@ -66,15 +66,11 @@ public class IndividualServiceImp implements IndividualService {
         // Retrieve data of the second client
         IndividualDto client2 = getIndividual(icpdedublication);
 
-        // Check if the full names of the clients match
-        if (client1.getName().equals(client2.getName()) && client1.getSurname().equals(client2.getSurname())
-                && client1.getPatronymic().equals(client2.getPatronymic())) {
-            log.info("Client's full name matches");
+        if (eventType.equals(DEDUPLICATION)) {
+            log.info("EventType -DEDUPLICATION");
 
-            // Check if the birth dates of the clients match
-            if (client1.getBirthDate().equals(client2.getBirthDate())) {
-                log.info("Сlient's birthday coincides");
-                if (eventType == DEDUPLICATION) {
+            if (isIdentical(client1,client2)) {
+                log.info("Сlient's identical");
                     // Create a new object for merging the client data
                     IndividualDto mergedDto = mergedIndividual(client1, client2);
 
@@ -84,16 +80,44 @@ public class IndividualServiceImp implements IndividualService {
 
                     // Create a new record with the merged client data
                     updateIndividual(mergedDto);
-                }
+
             } else {
-                log.info("Сlient's birthday not coincides");
+                log.info("Сlient's not identical");
             }
         } else {
-            log.info("Client's full name does not match");
+            log.info("EventsType is not DEDUPLICATION");
         }
 
         // Return an object with the data of the first client after the merge
         return getIndividual(icporigin);
+    }
+
+    /**
+     * Checks if two individual clients are identical based on their personal information.
+     *
+     * @param client1 the first individual client
+     * @param client2 the second individual client
+     * @return true if the clients are identical, false otherwise
+     */
+    private boolean isIdentical(IndividualDto client1, IndividualDto client2) {
+        IdenticalIndividualDto dto1 = getIdentical(client1);
+        IdenticalIndividualDto dto2 = getIdentical(client2);
+        return dto1.equals(dto2);
+    }
+
+    /**
+     * Creates an instance of IdenticalIndividualDto based on the personal information of an individual client.
+     *
+     * @param client the individual client
+     * @return an instance of IdenticalIndividualDto
+     */
+    private IdenticalIndividualDto getIdentical(IndividualDto client) {
+        IdenticalIndividualDto dto = new IdenticalIndividualDto();
+        dto.setName(client.getName());
+        dto.setSurname(client.getSurname());
+        dto.setPatronymic(client.getPatronymic());
+        dto.setBirthDate(client.getBirthDate());
+        return dto;
     }
 
     /**

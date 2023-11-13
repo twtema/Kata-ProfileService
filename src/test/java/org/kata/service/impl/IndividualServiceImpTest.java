@@ -51,7 +51,7 @@ public class IndividualServiceImpTest {
         File file1 = new File("src/test/java/org/kata/service/impl/ind1.json");
         String content = FileUtils.readFileToString(file1, "UTF-8");
         IndividualDto dto1 = mapper.readValue(content, IndividualDto.class);
-        log.info("Cчитали с файла клиент 1- " + dto1);
+        log.info("Cчитали с файла клиент 1 - " + dto1);
         individualService.updateIndividual(dto1);
         Assert.assertEquals("Valentin11", individualService.getIndividual("100").getName());
         Assert.assertThrows(IndividualNotFoundException.class, () -> individualService.getIndividual("200"));
