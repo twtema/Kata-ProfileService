@@ -12,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.kata.dto.IndividualDto;
 import org.kata.exception.BadRequestException;
 import org.kata.exception.IndividualNotFoundException;
-import org.kata.mapper.util.TimeUtils;
 import org.kata.service.IndividualService;
 import org.springdoc.api.ErrorMessage;
 import org.springframework.http.HttpStatus;
@@ -79,17 +78,12 @@ public class IndividualController {
     ) {
         if ((StringUtils.isNotEmpty(icp) && StringUtils.isNotEmpty(phone)) ||
                 (StringUtils.isEmpty(icp) && StringUtils.isEmpty(phone))) {
-            throw new BadRequestException("Exactly one of the parameters (icp or phone) must be provided" +
-                    " - " +
-                    TimeUtils.getTime()
-            );
+            throw new BadRequestException("Exactly one of the parameters (icp or phone) must be provided");
         }
         IndividualDto individual = icpOrPhone(icp, phone);
         if (individual == null) {
             throw new IndividualNotFoundException("Individual not found: icp = " + icp +
-                    " phone = " + phone + " - " +
-                    TimeUtils.getTime()
-            );
+                    " phone = " + phone);
         }
         return ResponseEntity.ok(individual);
     }
