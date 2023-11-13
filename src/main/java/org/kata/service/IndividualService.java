@@ -8,5 +8,4 @@ public interface IndividualService {
 
     void createTestIndividual(int n);
 
-    IndividualDto getIndividualByPhoneNumber(String phoneNumber);
 }

@@ -127,27 +127,6 @@ public class IndividualController {
         individualService.createTestIndividual(n);
         return "Success create " + n + "Individual, pls check Kafka and DB";
     }
-
-    @Operation(summary = "Get Individual by phone number")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Individual is found",
-                    content = @Content(
-                            mediaType = "Application/JSON",
-                            schema = @Schema(implementation = IndividualDto.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Individual is NOT found",
-                    content = @Content(
-                            mediaType = "Application/JSON",
-                            schema = @Schema(implementation = ErrorMessage.class)
-                    )
-            )
-    })
-
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IndividualNotFoundException.class)
     public ErrorMessage getIndividualHandler(IndividualNotFoundException e) {
