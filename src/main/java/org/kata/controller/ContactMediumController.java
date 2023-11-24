@@ -19,8 +19,14 @@ public class ContactMediumController {
     private final ContactMediumService contactMediumService;
 
     @GetMapping("/getActual")
-    public ResponseEntity<List<ContactMediumDto>> getContactMedium(@RequestParam String icp) {
-        return new ResponseEntity<>(contactMediumService.getActualContactMedium(icp), HttpStatus.OK);
+    public ResponseEntity<List<ContactMediumDto>> getContactMedium(@RequestParam String icp, @RequestParam String uuid) {
+        if (icp != null && uuid != null) {
+            return new ResponseEntity<>(contactMediumService.getActualContactMedium(icp, uuid), HttpStatus.OK);
+        } else if (icp != null) {
+            return new ResponseEntity<>(contactMediumService.getActualContactMedium(icp), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

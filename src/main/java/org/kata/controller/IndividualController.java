@@ -18,8 +18,14 @@ public class IndividualController {
     private final IndividualService individualService;
 
     @GetMapping
-    public ResponseEntity<IndividualDto> getIndividual(@RequestParam String icp) {
-        return new ResponseEntity<>(individualService.getIndividual(icp), HttpStatus.OK);
+    public ResponseEntity<IndividualDto> getIndividual(@RequestParam String icp, @RequestParam String uuid) {
+        if (icp != null && uuid != null) {
+            return new ResponseEntity<>(individualService.getIndividual(icp, uuid), HttpStatus.OK);
+        } else if (icp != null) {
+            return new ResponseEntity<>(individualService.getIndividual(icp), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping

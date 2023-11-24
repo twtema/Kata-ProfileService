@@ -16,8 +16,14 @@ public class AddressController {
     private final AddressService addressService;
 
     @GetMapping("/getActual")
-    public ResponseEntity<AddressDto> getAddress(@RequestParam String icp) {
-        return new ResponseEntity<>(addressService.getActualAddress(icp), HttpStatus.OK);
+    public ResponseEntity<AddressDto> getAddress(@RequestParam String icp, @RequestParam String uuid) {
+        if (icp != null && uuid != null) {
+            return new ResponseEntity<>(addressService.getActualAddress(icp, uuid), HttpStatus.OK);
+        } else if (icp != null) {
+            return new ResponseEntity<>(addressService.getActualAddress(icp), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
