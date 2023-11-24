@@ -236,6 +236,7 @@ public class IndividualServiceImp implements IndividualService {
                 });
     }
 
+
     private String printException(String icp) {
         return "Individual with icp " + icp;
     }
