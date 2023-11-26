@@ -16,6 +16,7 @@
         <lombok.version>1.18.28</lombok.version>
         <swagger-annotations.version>2.2.8</swagger-annotations.version>
         <springdoc-openapi-ui.version>1.6.15</springdoc-openapi-ui.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
         <junit.version>4.13</junit.version>
         <javafaker.version>0.18</javafaker.version>
         <maven.compiler.source>17</maven.compiler.source>
@@ -71,5 +72,23 @@
             <artifactId>javafaker</artifactId>
             <version>${javafaker.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+
     </dependencies>
 </project>

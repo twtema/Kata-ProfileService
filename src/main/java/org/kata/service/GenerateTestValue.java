@@ -1,15 +1,17 @@
 package org.kata.service;
 
 import com.github.javafaker.Faker;
-import org.kata.dto.AddressDto;
-import org.kata.dto.ContactMediumDto;
-import org.kata.dto.DocumentDto;
-import org.kata.dto.IndividualDto;
+import lombok.SneakyThrows;
+import org.kata.dto.*;
 import org.kata.dto.enums.ContactMediumType;
 import org.kata.dto.enums.DocumentType;
 import org.kata.dto.enums.GenderType;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -35,7 +37,18 @@ public class GenerateTestValue {
                 .documents(generateRandomDocuments(icp))
                 .contacts(generateRandomContacts(icp))
                 .address(generateRandomAddresses(icp))
+                .avatar(generateRandomAvatars(icp))
                 .build();
+    }
+
+    private List<AvatarDto> generateRandomAvatars(String icp) {
+        return List.of(
+                AvatarDto.builder()
+                        .imageData(getAvatarImage())
+                        .filename("ava.jpg")
+                        .icp(icp)
+                        .build()
+        );
     }
 
     private GenderType getRandomGender() {
@@ -112,6 +125,21 @@ public class GenerateTestValue {
                 .postCode(faker.address().zipCode())
                 .country(faker.address().country())
                 .build());
+    }
+    @SneakyThrows
+    private byte[] getAvatarImage()  {
+        URL url = new URL("https://i.pravatar.cc/250");
+        InputStream in = new BufferedInputStream(url.openStream());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buf = new byte[1024];
+        int n = 0;
+        while (-1!=(n=in.read(buf)))
+        {
+            out.write(buf, 0, n);
+        }
+        out.close();
+        in.close();
+        return out.toByteArray();
     }
 
 }

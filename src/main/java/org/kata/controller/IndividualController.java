@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.kata.dto.IndividualDto;
 import org.kata.exception.IndividualNotFoundException;
 import org.kata.service.IndividualService;
@@ -14,6 +15,9 @@ import org.springdoc.api.ErrorMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 
 @Tag(name = "Individual", description = "The individual API")
 @RestController
@@ -70,6 +74,14 @@ public class IndividualController {
     public String createTestIndividual(@RequestParam int n) {
         individualService.createTestIndividual(n);
         return "Success create " + n + "Individual, pls check Kafka and DB";
+    }
+
+    @GetMapping("/getClientCard")
+    public void getClientCard(HttpServletResponse response, @RequestParam String icp) throws IOException {
+        PDDocument pdDocument = individualService.getClientCard(icp);
+        pdDocument.save(response.getOutputStream());
+        pdDocument.close();
+
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
