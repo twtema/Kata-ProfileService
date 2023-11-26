@@ -73,7 +73,7 @@ public class IndividualServiceImp implements IndividualService {
             if (isIdentical(original, dedublication)) {
                 log.info("Сlient's identical");
                 // Create a new object for merging the client data
-                IndividualDto mergedDto = mergedIndividual(original, dedublication);
+                IndividualDto mergedDto = dedublicatData(mergedIndividual(original, dedublication));
 
                 // Delete old client records
                 deleteIndividual(icporigin);
@@ -91,6 +91,24 @@ public class IndividualServiceImp implements IndividualService {
 
         // Return an object with the data of the first client after the merge
         return getIndividual(icporigin);
+    }
+
+    private IndividualDto dedublicatData(IndividualDto individualDto) {
+
+        try {
+            // Remove duplicate data
+            individualDto.setAddress(individualDto.getAddress().stream().distinct().toList());
+            individualDto.setAvatar(individualDto.getAvatar().stream().distinct().toList());
+            individualDto.setDocuments(individualDto.getDocuments().stream().distinct().toList());
+            individualDto.setContacts(individualDto.getContacts().stream().distinct().toList());
+            log.info("client removed duplicate data");
+
+        }  catch (NullPointerException e) {
+
+            throw new IndividualMergeException(printException(individualDto.getIcp()) + " not merged");
+        }
+
+        return  individualDto;
     }
 
     /**
@@ -180,14 +198,6 @@ public class IndividualServiceImp implements IndividualService {
             original.setBirthDate(dedublication.getBirthDate());
 
             log.info("client merged");
-
-            // Remove duplicate data
-            original.setAddress(original.getAddress().stream().distinct().toList());
-            original.setAvatar(original.getAvatar().stream().distinct().toList());
-            original.setDocuments(original.getDocuments().stream().distinct().toList());
-            original.setContacts(original.getContacts().stream().distinct().toList());
-            log.info("client removed duplicate data");
-
 
         } catch (NullPointerException e) {
 
