@@ -8,7 +8,7 @@ public interface IndividualService {
 
     void createTestIndividual(int n);
 
-    IndividualDto deduplication(String icporigin,
+    IndividualDto dedublication(String icporigin,
                               String icpdedublication,
                               EventType eventType);
 

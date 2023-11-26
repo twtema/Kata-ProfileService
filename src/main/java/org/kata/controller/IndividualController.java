@@ -6,9 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.kata.dto.IndividualDto;
 import org.kata.dto.enums.EventType;
@@ -93,7 +90,7 @@ public class IndividualController {
     public ResponseEntity<IndividualDto> dedublication(@RequestBody String icporigin,
                                                        @RequestBody String icpdedublication,
                                                        @RequestBody EventType eventType) {
-        return new ResponseEntity<>(individualService.deduplication
+        return new ResponseEntity<>(individualService.dedublication
                 (icporigin, icpdedublication, eventType), HttpStatus.OK);
     }
 }

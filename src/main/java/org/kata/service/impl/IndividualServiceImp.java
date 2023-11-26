@@ -60,7 +60,7 @@ public class IndividualServiceImp implements IndividualService {
      * @return An object with the data of the first client after the merge.
      */
     @Override
-    public IndividualDto deduplication(String icporigin, String icpdedublication, EventType eventType) {
+    public IndividualDto dedublication(String icporigin, String icpdedublication, EventType eventType) {
         // Retrieve data of the first client
         IndividualDto original = getIndividual(icporigin);
 
