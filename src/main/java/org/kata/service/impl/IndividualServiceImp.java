@@ -44,7 +44,7 @@ public class IndividualServiceImp implements IndividualService {
                 .retrieve()
                 .onStatus(HttpStatus::isError, response ->
                         Mono.error(new IndividualNotFoundException(
-                                "Individual with icp " + icp + " not found")
+                                printException(icp))
                         )
                 )
                 .bodyToMono(IndividualDto.class)
@@ -62,18 +62,18 @@ public class IndividualServiceImp implements IndividualService {
     @Override
     public IndividualDto deduplication(String icporigin, String icpdedublication, EventType eventType) {
         // Retrieve data of the first client
-        IndividualDto client1 = getIndividual(icporigin);
+        IndividualDto original = getIndividual(icporigin);
 
         // Retrieve data of the second client
-        IndividualDto client2 = getIndividual(icpdedublication);
+        IndividualDto dedublication = getIndividual(icpdedublication);
 
         if (eventType.equals(DEDUPLICATION)) {
             log.info("EventType -DEDUPLICATION");
 
-            if (isIdentical(client1, client2)) {
+            if (isIdentical(original, dedublication)) {
                 log.info("Сlient's identical");
                 // Create a new object for merging the client data
-                IndividualDto mergedDto = mergedIndividual(client1, client2);
+                IndividualDto mergedDto = mergedIndividual(original, dedublication);
 
                 // Delete old client records
                 deleteIndividual(icporigin);
@@ -96,26 +96,26 @@ public class IndividualServiceImp implements IndividualService {
     /**
      * Checks if two individual clients are identical based on their personal information.
      *
-     * @param client1 the first individual client
-     * @param client2 the second individual client
+     * @param original the first individual client
+     * @param dedublication the second individual client
      * @return true if the clients are identical, false otherwise
      */
-    private boolean isIdentical(IndividualDto client1, IndividualDto client2) {
-        return getIdentical(client1).equals(getIdentical(client2));
+    private boolean isIdentical(IndividualDto original, IndividualDto dedublication) {
+        return getIdentical(original).equals(getIdentical(dedublication));
     }
 
     /**
      * Creates an instance of IdenticalIndividualDto based on the personal information of an individual client.
      *
-     * @param client the individual client
+     * @param individualDto the individual client
      * @return an instance of IdenticalIndividualDto
      */
-    private IdenticalIndividualDto getIdentical(IndividualDto client) {
+    private IdenticalIndividualDto getIdentical(IndividualDto individualDto) {
         IdenticalIndividualDto dto = new IdenticalIndividualDto();
-        dto.setName(client.getName());
-        dto.setSurname(client.getSurname());
-        dto.setPatronymic(client.getPatronymic());
-        dto.setBirthDate(client.getBirthDate());
+        dto.setName(individualDto.getName());
+        dto.setSurname(individualDto.getSurname());
+        dto.setPatronymic(individualDto.getPatronymic());
+        dto.setBirthDate(individualDto.getBirthDate());
         return dto;
     }
 
@@ -154,7 +154,7 @@ public class IndividualServiceImp implements IndividualService {
                 .retrieve()
                 .onStatus(HttpStatus::isError, response ->
                         Mono.error(new IndividualNotFoundException(
-                                "Individual with icp " + icp + " not found")
+                                printException(icp) )
                         ))
                 .bodyToMono(HttpStatus.class)
                 .block();
@@ -163,38 +163,37 @@ public class IndividualServiceImp implements IndividualService {
     /**
      * This method is used to merge the data of two clients.
      *
-     * @param client1 An object with the data of the first client.
-     * @param client2 An object with the data of the second client.
+     * @param original An object with the data of the first client.
+     * @param dedublication An object with the data of the second client.
      * @return An object with the merged client data.
      */
-    private IndividualDto mergedIndividual(IndividualDto client1, IndividualDto client2) {
+    private IndividualDto mergedIndividual(IndividualDto original, IndividualDto dedublication) {
 
 
         try {
             // Merge the lists of client data
-            client1.getAvatar().addAll(client2.getAvatar());
-            client1.getDocuments().addAll(client2.getDocuments());
-            client1.getAddress().addAll(client2.getAddress());
-            client1.getContacts().addAll(client2.getContacts());
+            original.getAvatar().addAll(dedublication.getAvatar());
+            original.getDocuments().addAll(dedublication.getDocuments());
+            original.getAddress().addAll(dedublication.getAddress());
+            original.getContacts().addAll(dedublication.getContacts());
 
-            // client1.setPlaceOfBirth(client1.getPlaceOfBirth());
-            client1.setBirthDate(client2.getBirthDate());
+            original.setBirthDate(dedublication.getBirthDate());
 
             log.info("client merged");
 
             // Remove duplicate data
-            client1.setAddress(client1.getAddress().stream().distinct().toList());
-            client1.setAvatar(client1.getAvatar().stream().distinct().toList());
-            client1.setDocuments(client1.getDocuments().stream().distinct().toList());
-            client1.setContacts(client1.getContacts().stream().distinct().toList());
+            original.setAddress(original.getAddress().stream().distinct().toList());
+            original.setAvatar(original.getAvatar().stream().distinct().toList());
+            original.setDocuments(original.getDocuments().stream().distinct().toList());
+            original.setContacts(original.getContacts().stream().distinct().toList());
             log.info("client removed duplicate data");
 
 
         } catch (NullPointerException e) {
             // обработка исключения,логирование ошибки
-            throw new IndividualMergeException(client1.getIcp());
+            throw new IndividualMergeException(original.getIcp());
         }
-        return client1;
+        return original;
     }
 
     public void createTestIndividual(int n) {
@@ -204,6 +203,10 @@ public class IndividualServiceImp implements IndividualService {
                     kafkaMessageSender.sendMessage(dto);
                     log.info("Create Individual with icp:{}", dto.getIcp());
                 });
+    }
+
+    private String printException(String icp) {
+        return "Individual with icp " + icp + " not found";
     }
 
 }
