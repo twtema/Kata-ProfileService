@@ -44,7 +44,7 @@ public class IndividualServiceImp implements IndividualService {
                 .retrieve()
                 .onStatus(HttpStatus::isError, response ->
                         Mono.error(new IndividualNotFoundException(
-                                printException(icp))
+                                printException(icp) + " not found")
                         )
                 )
                 .bodyToMono(IndividualDto.class)
@@ -133,7 +133,7 @@ public class IndividualServiceImp implements IndividualService {
                 .retrieve()
                 .onStatus(HttpStatus::isError, response ->
                         Mono.error(new IndividualNotFoundException(
-                                "Individual with icp " + dto.getIcp() + " not update")
+                                printException( dto.getIcp()) + " not update")
                         ))
                 .bodyToMono(IndividualDto.class)
                 .block();
@@ -154,7 +154,7 @@ public class IndividualServiceImp implements IndividualService {
                 .retrieve()
                 .onStatus(HttpStatus::isError, response ->
                         Mono.error(new IndividualNotFoundException(
-                                printException(icp) )
+                                printException(icp) + " not found")
                         ))
                 .bodyToMono(HttpStatus.class)
                 .block();
@@ -190,8 +190,8 @@ public class IndividualServiceImp implements IndividualService {
 
 
         } catch (NullPointerException e) {
-            // обработка исключения,логирование ошибки
-            throw new IndividualMergeException(original.getIcp());
+
+            throw new IndividualMergeException(printException(original.getIcp()) + " not merged");
         }
         return original;
     }
@@ -206,7 +206,7 @@ public class IndividualServiceImp implements IndividualService {
     }
 
     private String printException(String icp) {
-        return "Individual with icp " + icp + " not found";
+        return "Individual with icp " + icp;
     }
 
 }
