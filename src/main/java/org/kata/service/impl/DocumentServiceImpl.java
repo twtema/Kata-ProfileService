@@ -31,7 +31,7 @@ public class DocumentServiceImpl implements DocumentService {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(urlProperties.getProfileLoaderGetDocument())
-                            .queryParam("icp", icp)
+                            .queryParam("id", icp)
                             .build())
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
@@ -55,7 +55,7 @@ public class DocumentServiceImpl implements DocumentService {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(urlProperties.getProfileLoaderGetDocument())
-                            .queryParam("icp", icp)
+                            .queryParam("id", icp)
                             .queryParam("type", type)
                             .build())
                     .retrieve()

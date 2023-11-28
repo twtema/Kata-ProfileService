@@ -45,14 +45,14 @@ public class DocumentController {
             )
     })
     @GetMapping("/getActual")
-    public ResponseEntity<List<DocumentDto>> getDocument(@RequestParam String id, @RequestParam String type) {
+    public ResponseEntity<List<DocumentDto>> getDocument(@RequestParam(required = false) String id,
+                                                         @RequestParam(required = false) String type) {
         if (id != null && type != null) {
             return new ResponseEntity<>(documentService.getActualDocument(id, type), HttpStatus.OK);
         } else if (id != null) {
             return new ResponseEntity<>(documentService.getActualDocument(id), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

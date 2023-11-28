@@ -30,7 +30,7 @@ public class ContactMediumServiceImpl implements ContactMediumService {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(urlProperties.getProfileLoaderGetContactMedium())
-                            .queryParam("icp", icp)
+                            .queryParam("id", icp)
                             .build())
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
@@ -55,7 +55,7 @@ public class ContactMediumServiceImpl implements ContactMediumService {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(urlProperties.getProfileLoaderGetContactMedium())
-                            .queryParam("icp", icp)
+                            .queryParam("id", icp)
                             .queryParam("type", uuid)
                             .build())
                     .retrieve()
