@@ -42,14 +42,14 @@ public class AddressController {
             )
     })
     @GetMapping("/getActual")
-    public ResponseEntity<AddressDto> getAddress(@RequestParam String id, @RequestParam String type) {
+    public ResponseEntity<AddressDto> getAddress(@RequestParam(required = false) String id,
+                                                 @RequestParam(required = false) String type) {
         if (id != null && type != null) {
             return new ResponseEntity<>(addressService.getActualAddress(id, type), HttpStatus.OK);
         } else if (id != null) {
             return new ResponseEntity<>(addressService.getActualAddress(id), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

@@ -27,7 +27,7 @@ public class AvatarServiceImpl implements AvatarService {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(urlProperties.getProfileLoaderGetAvatar())
-                            .queryParam("icp", icp)
+                            .queryParam("id", icp)
                             .build())
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
@@ -51,8 +51,8 @@ public class AvatarServiceImpl implements AvatarService {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(urlProperties.getProfileLoaderGetAvatar())
-                            .queryParam("icp", icp)
-                            .queryParam("uuid", type)
+                            .queryParam("id", icp)
+                            .queryParam("type", type)
                             .build())
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->

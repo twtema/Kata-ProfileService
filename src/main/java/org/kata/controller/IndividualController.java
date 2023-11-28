@@ -53,15 +53,15 @@ public class IndividualController {
                     )
             )
     })
-    @GetMapping
-    public ResponseEntity<IndividualDto> getIndividual(@RequestParam String id, @RequestParam String type) {
+    @GetMapping("/getActual")
+    public ResponseEntity<IndividualDto> getIndividual(@RequestParam(required = false) String id,
+                                                       @RequestParam(required = false) String type) {
         if (id != null && type != null) {
             return new ResponseEntity<>(individualService.getIndividual(id, type), HttpStatus.OK);
         } else if (id != null) {
             return new ResponseEntity<>(individualService.getIndividual(id), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
     @Operation(
             summary = "Get Individual by ICP or phone number",
