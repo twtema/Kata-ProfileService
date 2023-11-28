@@ -6,15 +6,21 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;
 import org.kata.dto.IndividualDto;
 import org.kata.dto.enums.EventType;
 import org.kata.exception.IndividualNotFoundException;
+import org.kata.service.IndividualQRCodeService;
 import org.kata.service.IndividualService;
 import org.springdoc.api.ErrorMessage;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+
 
 @Tag(name = "Individual", description = "The individual API")
 @RestController
@@ -23,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 public class IndividualController {
 
     private final IndividualService individualService;
+    private final IndividualQRCodeService individualQRCodeService;
 
     @Operation(summary = "Get the Individual")
     @ApiResponses(value = {
@@ -46,6 +53,13 @@ public class IndividualController {
     @GetMapping
     public ResponseEntity<IndividualDto> getIndividual(@RequestParam String icp) {
         return new ResponseEntity<>(individualService.getIndividual(icp), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/createQRCode", produces = MediaType.IMAGE_PNG_VALUE)
+    public byte[] generateQrCode(@RequestParam String icp) throws IOException, WriterException {
+        IndividualDto individualDto = individualService.getIndividual(icp);
+
+        return individualQRCodeService.generateQRCode(individualDto, 270, 270);
     }
 
     @Operation(summary = "Create random Individuals by n (count)")
