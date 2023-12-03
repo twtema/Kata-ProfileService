@@ -17,6 +17,7 @@
         <swagger-annotations.version>2.2.8</swagger-annotations.version>
         <springdoc-openapi-ui.version>1.6.15</springdoc-openapi-ui.version>
         <junit.version>4.13</junit.version>
+        <common-io.version>2.11.0</common-io.version>
         <javafaker.version>0.18</javafaker.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -66,6 +67,12 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${common-io.version}</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Для генерации случайных данных-->
         <dependency>
             <groupId>com.github.javafaker</groupId>
@@ -84,4 +91,24 @@
             <version>${prometheus.version}</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>org.kata.ProfileServiceApplication</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <finalName>ProfileService</finalName>
+    </build>
 </project>

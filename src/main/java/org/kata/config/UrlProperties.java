@@ -18,4 +18,7 @@ public class UrlProperties {
     private String profileLoaderGetContactMedium;
     private String profileLoaderGetAvatar;
     private String profileLoaderGetAddress;
+    private String ProfileLoaderDeleteIndividual;
+    private String ProfileLoaderUpdateIndividual;
+    private String ProfileLoaderPostIndividual;
 }
