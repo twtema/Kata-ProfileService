@@ -42,15 +42,13 @@ public class IndividualController {
                     )
             )
     })
-    @GetMapping("/getActual")
-    public ResponseEntity<IndividualDto> getIndividual(@RequestParam(required = false) String id,
+    @GetMapping
+    public ResponseEntity<IndividualDto> getIndividual(String id,
                                                        @RequestParam(required = false) String type) {
-        if (id != null && type != null) {
-            return new ResponseEntity<>(individualService.getIndividual(id, type), HttpStatus.OK);
-        } else if (id != null) {
+        if (type == null) {
             return new ResponseEntity<>(individualService.getIndividual(id), HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(individualService.getIndividual(id, type), HttpStatus.OK);
     }
 
     @Operation(summary = "Create random Individuals by n (count)")
