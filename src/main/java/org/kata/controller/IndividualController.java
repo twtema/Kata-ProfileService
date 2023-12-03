@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 
-@Tag(name = "Individual", description = "The individual API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("v1/individual")
@@ -31,25 +30,6 @@ public class IndividualController {
     private final IndividualService individualService;
     private final IndividualQRCodeService individualQRCodeService;
 
-    @Operation(summary = "Get the Individual")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "The Individual is found",
-                    content = @Content(
-                            mediaType = "Application/JSON",
-                            schema = @Schema(implementation = IndividualDto.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "The Individual is NOT found",
-                    content = @Content(
-                            mediaType = "Application/JSON",
-                            schema = @Schema(implementation = ErrorMessage.class)
-                    )
-            )
-    })
     @GetMapping
     public ResponseEntity<IndividualDto> getIndividual(@RequestParam String icp) {
         return new ResponseEntity<>(individualService.getIndividual(icp), HttpStatus.OK);
