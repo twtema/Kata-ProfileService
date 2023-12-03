@@ -6,11 +6,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import com.google.zxing.WriterException;
-import com.google.zxing.WriterException;
-import jdk.jfr.EventType;
 import lombok.RequiredArgsConstructor;
 import org.kata.dto.IndividualDto;
+import org.kata.dto.enums.EventType;
 import org.kata.exception.IndividualNotFoundException;
 import org.kata.service.IndividualQRCodeService;
 import org.kata.service.IndividualService;
@@ -21,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-
 
 
 @Tag(name = "Individual", description = "The individual API")
@@ -57,6 +54,32 @@ public class IndividualController {
         return new ResponseEntity<>(individualService.getIndividual(icp), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/createQRCode", produces = MediaType.IMAGE_PNG_VALUE)
+    public byte[] generateQrCode(@RequestParam String icp) throws IOException {
+        IndividualDto individualDto = individualService.getIndividual(icp);
+
+        return individualQRCodeService.generateQRCode(individualDto, 270, 270);
+    }
+
+    @Operation(summary = "Create random Individuals by n (count)")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successful Individuals creation",
+                    content = @Content(
+                            mediaType = "Application/JSON",
+                            schema = @Schema(implementation = String.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            mediaType = "Application/JSON",
+                            schema = @Schema(implementation = ErrorMessage.class)
+                    )
+            )
+    })
     @GetMapping(value = "/createQRCode", produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] generateQrCode(@RequestParam String icp) throws IOException, WriterException {
         IndividualDto individualDto = individualService.getIndividual(icp);
