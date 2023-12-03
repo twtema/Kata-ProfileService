@@ -55,6 +55,25 @@ public class IndividualController {
         return new ResponseEntity<>(individualService.getIndividual(icp), HttpStatus.OK);
     }
 
+    @Operation(summary = "Create random Individuals by n (count)")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successful Individuals creation",
+                    content = @Content(
+                            mediaType = "Application/JSON",
+                            schema = @Schema(implementation = String.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            mediaType = "Application/JSON",
+                            schema = @Schema(implementation = ErrorMessage.class)
+                    )
+            )
+    })
     @GetMapping(value = "/createQRCode", produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] generateQrCode(@RequestParam String icp) throws IOException, WriterException {
         IndividualDto individualDto = individualService.getIndividual(icp);
