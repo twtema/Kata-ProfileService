@@ -14,7 +14,7 @@ public class UrlProperties {
     private String profileLoaderBaseUrl;
 
     private String profileLoaderGetIndividual;
-    private String profileLoaderGetDocuments;
+    private String profileLoaderGetAllDocuments;
     private String profileLoaderGetContactMedium;
     private String profileLoaderGetAvatar;
     private String profileLoaderGetAddress;
