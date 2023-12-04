@@ -32,4 +32,6 @@ public class DocumentDto {
 
     @Schema(description = "Дата окончания срока документа", example = "2030-04-10")
     private Date expirationDate;
+
+    private boolean actual;
 }
