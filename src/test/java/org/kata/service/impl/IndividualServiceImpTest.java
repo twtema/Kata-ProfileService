@@ -71,7 +71,7 @@ public class IndividualServiceImpTest {
 
         // слияние клиентов
         Assert.assertEquals("Bobby",
-                individualService.deduplication("100", "200", EventType.DEDUPLICATION)
+                individualService.dedublication("100", "200", EventType.DEDUPLICATION)
                         .getPatronymic());
         log.info("Cделали слияние - " + individualService.getIndividual("100"));
 
