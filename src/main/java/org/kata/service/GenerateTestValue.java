@@ -1,15 +1,15 @@
 package org.kata.service;
 
 import com.github.javafaker.Faker;
-import org.kata.dto.AddressDto;
-import org.kata.dto.ContactMediumDto;
-import org.kata.dto.DocumentDto;
-import org.kata.dto.IndividualDto;
+import org.kata.dto.*;
 import org.kata.dto.enums.ContactMediumType;
 import org.kata.dto.enums.DocumentType;
 import org.kata.dto.enums.GenderType;
 import org.springframework.stereotype.Component;
-
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -35,7 +35,7 @@ public class GenerateTestValue {
                 .documents(generateRandomDocuments(icp))
                 .contacts(generateRandomContacts(icp))
                 .address(generateRandomAddresses(icp))
-                .build();
+                .avatar(generateRandomAvatars(icp)).build();
     }
 
     private GenderType getRandomGender() {
@@ -114,4 +114,47 @@ public class GenerateTestValue {
                 .build());
     }
 
+    private List<AvatarDto> generateRandomAvatars(String icp) {
+        return List.of(AvatarDto.builder()
+                .imageData(getAvatarImage())
+                .filename("ava.jpg")
+                .icp(icp)
+                .build());
+    }
+
+    private byte[] getAvatarImage() {
+        try {
+            return getAvatarImageFromUrl();
+        } catch (IOException e) {
+            try {
+                return getAvatarImageFromFile();
+            } catch (IOException ex) {
+                return new byte[0];
+            }
+        }
+    }
+
+    private byte[] getAvatarImageFromUrl() throws IOException {
+
+        var url = new URL("https://i.pravatar.cc/250");
+        try (var in = new BufferedInputStream(url.openStream());
+             var out = new ByteArrayOutputStream()) {
+            byte[] buf = new byte[1024];
+            int n = 0;
+            while (-1 != (n = in.read(buf))) {
+                out.write(buf, 0, n);
+            }
+            return out.toByteArray();
+        }
+
+    }
+
+    private byte[] getAvatarImageFromFile() throws IOException {
+        File imgPath = new File("src/test/resources/image/img.png");
+        BufferedImage bufferedImage = ImageIO.read(imgPath);
+        try (var out = new ByteArrayOutputStream()) {
+            ImageIO.write(bufferedImage, "png", out);
+            return out.toByteArray();
+        }
+    }
 }
