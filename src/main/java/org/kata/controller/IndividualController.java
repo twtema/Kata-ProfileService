@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.kata.dto.IndividualDto;
 import org.kata.exception.BadRequestException;
+import org.kata.dto.enums.EventType;
 import org.kata.exception.IndividualNotFoundException;
 import org.kata.service.IndividualService;
 import org.springdoc.api.ErrorMessage;
@@ -127,4 +128,18 @@ public class IndividualController {
         return new ErrorMessage(e.getMessage());
     }
 
+
+    @Operation(summary = "Dedublication, merge Individual")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful deduplication"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/deduplication")
+    public ResponseEntity<IndividualDto> dedublication(@RequestBody String icporigin,
+                                                       @RequestBody String icpdedublication,
+                                                       @RequestBody EventType eventType) {
+        return new ResponseEntity<>(individualService.dedublication
+                (icporigin, icpdedublication, eventType), HttpStatus.OK);
+    }
 }
