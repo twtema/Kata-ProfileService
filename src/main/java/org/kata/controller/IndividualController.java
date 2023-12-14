@@ -1,5 +1,6 @@
 package org.kata.controller;
 
+import com.google.zxing.WriterException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,11 +14,16 @@ import org.kata.dto.IndividualDto;
 import org.kata.exception.BadRequestException;
 import org.kata.dto.enums.EventType;
 import org.kata.exception.IndividualNotFoundException;
+import org.kata.service.IndividualQRCodeService;
 import org.kata.service.IndividualService;
 import org.springdoc.api.ErrorMessage;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+
 
 @Tag(name = "Individual", description = "The individual API")
 @RestController
@@ -26,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 public class IndividualController {
 
     private final IndividualService individualService;
+    private final IndividualQRCodeService individualQRCodeService;
 
     @Operation(summary = "Get the Individual")
     @ApiResponses(value = {
@@ -97,6 +104,10 @@ public class IndividualController {
         }
         return individual;
     }
+
+
+
+
 
     @Operation(summary = "Create random Individuals by n (count)")
     @ApiResponses(value = {
