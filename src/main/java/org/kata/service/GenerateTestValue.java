@@ -1,15 +1,16 @@
 package org.kata.service;
 
 import com.github.javafaker.Faker;
-import org.kata.dto.AddressDto;
-import org.kata.dto.ContactMediumDto;
-import org.kata.dto.DocumentDto;
-import org.kata.dto.IndividualDto;
+import org.kata.dto.*;
 import org.kata.dto.enums.ContactMediumType;
+import org.kata.dto.enums.CurrencyType;
 import org.kata.dto.enums.DocumentType;
 import org.kata.dto.enums.GenderType;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -35,6 +36,7 @@ public class GenerateTestValue {
                 .documents(generateRandomDocuments(icp))
                 .contacts(generateRandomContacts(icp))
                 .address(generateRandomAddresses(icp))
+                .wallet(generateRandomWallet(icp))
                 .build();
     }
 
@@ -114,4 +116,17 @@ public class GenerateTestValue {
                 .build());
     }
 
+    private CurrencyType generateRandomCurrencyType () {
+        CurrencyType[] currencyTypes = CurrencyType.values();
+        int randomIndex = faker.random().nextInt(currencyTypes.length);
+        return currencyTypes[randomIndex];
+    }
+    private List<WalletDto> generateRandomWallet(String icp) {
+        return List.of(WalletDto.builder()
+                .walletId(icp + "1")
+                .currencyType(generateRandomCurrencyType())
+                .balance(BigDecimal.valueOf(faker.random().nextDouble() * faker.random().nextInt(100000)).setScale(2, RoundingMode.HALF_EVEN))
+                .build()
+        );
+    }
 }
