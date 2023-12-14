@@ -157,6 +157,24 @@ public class IndividualServiceImp implements IndividualService {
                 .block();
     }
 
+
+    @Override
+    public IndividualDto getIndividualByPhoneNumber(String phone) {
+        return loaderWebClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(urlProperties.getProfileLoaderGetIndividualByPhoneNumber())
+                        .queryParam("phone", phone)
+                        .build())
+                .retrieve()
+                .onStatus(HttpStatus::isError, response ->
+                        Mono.error(new IndividualNotFoundException(
+                                "Individual with phone number " + phone + " not found")
+                        )
+                )
+                .bodyToMono(IndividualDto.class)
+                .block();
+    }
+
     /**
      * This method is used to delete client data.
      *
