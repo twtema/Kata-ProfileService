@@ -6,6 +6,7 @@ import org.kata.dto.AvatarDto;
 import org.kata.dto.ContactMediumDto;
 import org.kata.dto.DocumentDto;
 import org.kata.dto.IndividualDto;
+import org.kata.dto.WalletDto;
 import org.kata.dto.enums.ContactMediumType;
 import org.kata.dto.enums.CurrencyType;
 import org.kata.dto.enums.DocumentType;
