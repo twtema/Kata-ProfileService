@@ -21,6 +21,7 @@
         <javafaker.version>0.18</javafaker.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <prometheus.version>1.12.0</prometheus.version>
     </properties>
 
     <dependencies>
@@ -59,6 +60,12 @@
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>${springdoc-openapi-ui.version}</version>
         </dependency>
+        <!--QR code-->
+        <dependency>
+            <groupId>com.github.hiwepy</groupId>
+            <artifactId>zxing-spring-boot-starter</artifactId>
+            <version>2.0.0.RELEASE</version>
+        </dependency>
         <!--Test -->
         <dependency>
             <groupId>junit</groupId>
@@ -78,7 +85,17 @@
             <artifactId>javafaker</artifactId>
             <version>${javafaker.version}</version>
         </dependency>
-
+        <!--        Зависимости для Prometheus -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>${prometheus.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

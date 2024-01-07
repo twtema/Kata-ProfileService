@@ -24,10 +24,10 @@ public class DocumentServiceImpl implements DocumentService {
         this.loaderWebClient = WebClient.create(urlProperties.getProfileLoaderBaseUrl());
     }
 
-    public List<DocumentDto> getActualDocuments(String icp) {
+    public List<DocumentDto> getAllDocuments(String icp) {
         return loaderWebClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(urlProperties.getProfileLoaderGetDocuments())
+                        .path(urlProperties.getProfileLoaderGetAllDocuments())
                         .queryParam("icp", icp)
                         .build())
                 .retrieve()

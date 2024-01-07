@@ -1,14 +1,25 @@
 package org.kata.service;
 
 import com.github.javafaker.Faker;
-import org.kata.dto.*;
+import org.kata.dto.AddressDto;
+import org.kata.dto.AvatarDto;
+import org.kata.dto.ContactMediumDto;
+import org.kata.dto.DocumentDto;
+import org.kata.dto.IndividualDto;
 import org.kata.dto.enums.ContactMediumType;
+import org.kata.dto.enums.CurrencyType;
 import org.kata.dto.enums.DocumentType;
 import org.kata.dto.enums.GenderType;
 import org.springframework.stereotype.Component;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
@@ -35,7 +46,9 @@ public class GenerateTestValue {
                 .documents(generateRandomDocuments(icp))
                 .contacts(generateRandomContacts(icp))
                 .address(generateRandomAddresses(icp))
-                .avatar(generateRandomAvatars(icp)).build();
+                .wallet(generateRandomWallet(icp))
+                .avatar(generateRandomAvatars(icp))
+                .build();
     }
 
     private GenderType getRandomGender() {
@@ -156,5 +169,20 @@ public class GenerateTestValue {
             ImageIO.write(bufferedImage, "png", out);
             return out.toByteArray();
         }
+    }
+
+    private CurrencyType generateRandomCurrencyType () {
+        CurrencyType[] currencyTypes = CurrencyType.values();
+        int randomIndex = faker.random().nextInt(currencyTypes.length);
+        return currencyTypes[randomIndex];
+    }
+
+    private List<WalletDto> generateRandomWallet(String icp) {
+        return List.of(WalletDto.builder()
+                .walletId(icp + "1")
+                .currencyType(generateRandomCurrencyType())
+                .balance(BigDecimal.valueOf(faker.random().nextDouble() * faker.random().nextInt(100000)).setScale(2, RoundingMode.HALF_EVEN))
+                .build()
+        );
     }
 }
