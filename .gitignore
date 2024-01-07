@@ -23,8 +23,7 @@
 hs_err_pid*
 replay_pid*
 
-
-profile-service.iml
+#intellig idea files
 /.idea/
+*.iml
 target/
-
