@@ -5,6 +5,7 @@ import org.kata.dto.enums.EventType;
 
 public interface IndividualService {
     IndividualDto getIndividual(String icp);
+    IndividualDto getIndividual(String icp, String uuid);
     IndividualDto getIndividualByPhoneNumber(String phone);
 
     void createTestIndividual(int n);
@@ -12,8 +13,4 @@ public interface IndividualService {
     IndividualDto dedublication(String icporigin,
                               String icpdedublication,
                               EventType eventType);
-
-
-
-
 }

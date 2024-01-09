@@ -2,7 +2,8 @@ package org.kata.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.kata.config.UrlProperties;
-import org.kata.dto.*;
+import org.kata.dto.IdenticalIndividualDto;
+import org.kata.dto.IndividualDto;
 import org.kata.dto.enums.EventType;
 import org.kata.exception.IndividualMergeException;
 import org.kata.exception.IndividualNotFoundException;
@@ -36,21 +37,52 @@ public class IndividualServiceImp implements IndividualService {
     }
 
     public IndividualDto getIndividual(String icp) {
-        return loaderWebClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(urlProperties.getProfileLoaderGetIndividual())
-                        .queryParam("icp", icp)
-                        .build())
-                .retrieve()
-                .onStatus(HttpStatus::isError, response ->
-                        Mono.error(new IndividualNotFoundException(
-                                printException(icp) + " not found")
-                        )
-                )
-                .bodyToMono(IndividualDto.class)
-                .block();
+        if (icp != null) {
+            return loaderWebClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(urlProperties.getProfileLoaderGetIndividual())
+                            .queryParam("id", icp)
+                            .build())
+                    .retrieve()
+                    .onStatus(HttpStatus::isError, response ->
+                            Mono.error(new IndividualNotFoundException(
+                                    "Individual with icp " + icp + " not found")
+                            )
+                    )
+                    .bodyToMono(IndividualDto.class)
+                    .block();
+
+        } else {
+            throw new IllegalArgumentException("ERROR");
+        }
     }
 
+    @Override
+    public IndividualDto getIndividual(String icp, String type) {
+        if (icp == null && type == null) {
+            throw new IllegalArgumentException("Not found parameters");
+        }
+        if (type.equals("uuid")) {
+            return loaderWebClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(urlProperties.getProfileLoaderGetIndividual())
+                            .queryParam("id", icp)
+                            .queryParam("type", type)
+                            .build())
+                    .retrieve()
+                    .onStatus(HttpStatus::isError, response ->
+                            Mono.error(new IndividualNotFoundException(
+                                    "Individual with icp " + icp + " not found")
+                            )
+                    )
+                    .bodyToMono(IndividualDto.class)
+                    .block();
+        } else if (type.isEmpty()) {
+            return getIndividual(icp);
+        } else {
+            throw new IllegalArgumentException("Invalid type");
+        }
+    }
     /**
      * This method merges the data of two clients.
      *

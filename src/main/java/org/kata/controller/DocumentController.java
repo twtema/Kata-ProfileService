@@ -44,9 +44,13 @@ public class DocumentController {
                     )
             )
     })
-    @GetMapping("/getAll")
-    public ResponseEntity<List<DocumentDto>> getDocument(@RequestParam String icp) {
-        return new ResponseEntity<>(documentService.getAllDocuments(icp), HttpStatus.OK);
+    @GetMapping
+    public ResponseEntity<List<DocumentDto>> getDocument(String id,
+                                                         @RequestParam(required = false) String type) {
+        if (type == null) {
+            return new ResponseEntity<>(documentService.getAllDocuments(id), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(documentService.getAllDocuments(id, type), HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

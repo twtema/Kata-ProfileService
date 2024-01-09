@@ -41,9 +41,13 @@ public class AddressController {
                     )
             )
     })
-    @GetMapping("/getActual")
-    public ResponseEntity<AddressDto> getAddress(@RequestParam String icp) {
-        return new ResponseEntity<>(addressService.getActualAddress(icp), HttpStatus.OK);
+    @GetMapping
+    public ResponseEntity<AddressDto> getAddress(String id,
+                                                 @RequestParam(required = false) String type) {
+        if (type == null) {
+            return new ResponseEntity<>(addressService.getActualAddress(id), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(addressService.getActualAddress(id, type), HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

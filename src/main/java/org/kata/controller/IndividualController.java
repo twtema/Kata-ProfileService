@@ -1,6 +1,5 @@
 package org.kata.controller;
 
-import com.google.zxing.WriterException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,11 +17,8 @@ import org.kata.service.IndividualQRCodeService;
 import org.kata.service.IndividualService;
 import org.springdoc.api.ErrorMessage;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 
 @Tag(name = "Individual", description = "The individual API")
@@ -54,8 +50,12 @@ public class IndividualController {
             )
     })
     @GetMapping
-    public ResponseEntity<IndividualDto> getIndividual(@RequestParam String icp) {
-        return new ResponseEntity<>(individualService.getIndividual(icp), HttpStatus.OK);
+    public ResponseEntity<IndividualDto> getIndividual(String id,
+                                                       @RequestParam(required = false) String type) {
+        if (type == null) {
+            return new ResponseEntity<>(individualService.getIndividual(id), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(individualService.getIndividual(id, type), HttpStatus.OK);
     }
     @Operation(
             summary = "Get Individual by ICP or phone number",
