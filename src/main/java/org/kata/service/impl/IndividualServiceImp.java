@@ -2,6 +2,7 @@ package org.kata.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.kata.config.UrlProperties;
+import org.kata.dto.IdenticalIndividualDto;
 import org.kata.dto.IndividualDto;
 import org.kata.dto.enums.EventType;
 import org.kata.exception.IndividualMergeException;
