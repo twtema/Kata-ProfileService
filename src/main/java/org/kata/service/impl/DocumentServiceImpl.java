@@ -26,11 +26,11 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<DocumentDto> getActualDocument(String icp) {
+    public List<DocumentDto> getAllDocuments(String icp) {
         if (icp != null) {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
-                            .path(urlProperties.getProfileLoaderGetDocument())
+                            .path(urlProperties.getProfileLoaderGetAllDocuments())
                             .queryParam("id", icp)
                             .build())
                     .retrieve()
@@ -47,14 +47,14 @@ public class DocumentServiceImpl implements DocumentService {
         }
     }
     @Override
-    public List<DocumentDto> getActualDocument(String icp, String type) {
+    public List<DocumentDto> getAllDocuments(String icp, String type) {
         if (icp == null && type == null) {
             throw new IllegalArgumentException("Not found parameters");
         }
         if (type.equals("uuid")) {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
-                            .path(urlProperties.getProfileLoaderGetDocument())
+                            .path(urlProperties.getProfileLoaderGetAllDocuments())
                             .queryParam("id", icp)
                             .queryParam("type", type)
                             .build())
@@ -68,7 +68,7 @@ public class DocumentServiceImpl implements DocumentService {
                     })
                     .block();
         } else if (type.isEmpty()) {
-            return getActualDocument(icp);
+            return getAllDocuments(icp);
         } else {
             throw new IllegalArgumentException("Invalid type");
         }

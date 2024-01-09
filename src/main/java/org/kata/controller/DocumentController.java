@@ -48,9 +48,9 @@ public class DocumentController {
     public ResponseEntity<List<DocumentDto>> getDocument(String id,
                                                          @RequestParam(required = false) String type) {
         if (type == null) {
-            return new ResponseEntity<>(documentService.getActualDocument(id), HttpStatus.OK);
+            return new ResponseEntity<>(documentService.getAllDocuments(id), HttpStatus.OK);
         }
-        return new ResponseEntity<>(documentService.getActualDocument(id, type), HttpStatus.OK);
+        return new ResponseEntity<>(documentService.getAllDocuments(id, type), HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
