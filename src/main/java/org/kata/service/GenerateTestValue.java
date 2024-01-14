@@ -8,6 +8,7 @@ import org.kata.dto.DocumentDto;
 import org.kata.dto.IndividualDto;
 import org.kata.dto.WalletDto;
 import org.kata.dto.enums.ContactMediumType;
+import org.kata.dto.enums.ContactMediumUsage;
 import org.kata.dto.enums.CurrencyType;
 import org.kata.dto.enums.DocumentType;
 import org.kata.dto.enums.GenderType;
@@ -93,11 +94,13 @@ public class GenerateTestValue {
 
     private ContactMediumDto generateRandomContactMedium(String icp) {
         ContactMediumType type = getRandomContactMediumType();
+        ContactMediumUsage usage = getRandomContactMediumUsage();
         String value = generateContactMediumValue(type);
 
         return ContactMediumDto.builder()
                 .icp(icp)
                 .type(type)
+                .usage(usage)
                 .value(value)
                 .build();
     }
@@ -106,6 +109,12 @@ public class GenerateTestValue {
         ContactMediumType[] contactMediumTypes = ContactMediumType.values();
         int randomIndex = faker.random().nextInt(contactMediumTypes.length);
         return contactMediumTypes[randomIndex];
+    }
+
+    private ContactMediumUsage getRandomContactMediumUsage() {
+        ContactMediumUsage[] contactMediumUsages = ContactMediumUsage.values();
+        int randomIndex = faker.random().nextInt(contactMediumUsages.length);
+        return contactMediumUsages[randomIndex];
     }
 
     private String generateContactMediumValue(ContactMediumType type) {
