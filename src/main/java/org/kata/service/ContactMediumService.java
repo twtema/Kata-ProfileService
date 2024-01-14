@@ -6,6 +6,10 @@ import java.util.List;
 
 public interface ContactMediumService {
     List<ContactMediumDto> getActualContactMedium(String icp);
-    List<ContactMediumDto> getActualContactMedium(String icp, String uuid);
 
+    List<ContactMediumDto> getActualContactMediumByType(String icp, String type);
+
+    List<ContactMediumDto> getActualContactMediumByUsage(String icp, String usage);
+
+    List<ContactMediumDto> getActualContactMediumByTypeAndUsage(String icp, String type, String usage);
 }

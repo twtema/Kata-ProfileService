@@ -47,11 +47,16 @@ public class ContactMediumController {
     })
     @GetMapping
     public ResponseEntity<List<ContactMediumDto>> getContactMedium(String id,
-                                                                   @RequestParam(required = false) String type) {
-        if (type == null) {
+                                                                   @RequestParam(required = false) String type,
+                                                                   @RequestParam(required = false) String usage) {
+        if (type == null && usage == null) {
             return new ResponseEntity<>(contactMediumService.getActualContactMedium(id), HttpStatus.OK);
+        } else if (type != null && usage == null) {
+            return new ResponseEntity<>(contactMediumService.getActualContactMediumByType(id, type), HttpStatus.OK);
+        } else if (usage != null && type == null) {
+            return new ResponseEntity<>(contactMediumService.getActualContactMediumByUsage(id, usage), HttpStatus.OK);
         }
-        return new ResponseEntity<>(contactMediumService.getActualContactMedium(id, type), HttpStatus.OK);
+        return new ResponseEntity<>(contactMediumService.getActualContactMediumByTypeAndUsage(id, type, usage), HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
