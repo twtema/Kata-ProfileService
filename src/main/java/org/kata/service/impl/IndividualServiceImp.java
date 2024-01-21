@@ -9,6 +9,7 @@ import org.kata.exception.IndividualNotFoundException;
 import org.kata.service.GenerateTestValue;
 import org.kata.service.IndividualService;
 import org.kata.service.KafkaMessageSender;
+import org.kata.util.PhoneNumberValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -228,6 +229,8 @@ public class IndividualServiceImp implements IndividualService {
         IntStream.range(0, n)
                 .forEach(i -> {
                     var dto = generateTestValue.generateRandomUser();
+                    PhoneNumberValidator.validatePhoneNumbers(dto.getContacts());
+
                     kafkaMessageSender.sendMessage(dto);
                     log.info("Create Individual with icp:{}", dto.getIcp());
                 });
