@@ -6,6 +6,8 @@ import org.kata.dto.DocumentDto;
 import org.kata.exception.DocumentsNotFoundException;
 import org.kata.exception.IndividualNotFoundException;
 import org.kata.service.DocumentService;
+import org.kata.service.GenerateTestValue;
+import org.kata.service.KafkaMessageSender;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,11 +20,15 @@ import java.util.List;
 @Slf4j
 public class DocumentServiceImpl implements DocumentService {
     private final UrlProperties urlProperties;
+    private final KafkaMessageSender kafkaMessageSender;
+    private final GenerateTestValue generateTestValue;
     private final WebClient loaderWebClient;
 
-    public DocumentServiceImpl(UrlProperties urlProperties) {
+    public DocumentServiceImpl(UrlProperties urlProperties, KafkaMessageSender kafkaMessageSender, GenerateTestValue generateTestValue) {
         this.urlProperties = urlProperties;
         this.loaderWebClient = WebClient.create(urlProperties.getProfileLoaderBaseUrl());
+        this.kafkaMessageSender = kafkaMessageSender;
+        this.generateTestValue = generateTestValue;
     }
 
     @Override
@@ -72,5 +78,13 @@ public class DocumentServiceImpl implements DocumentService {
         } else {
             throw new IllegalArgumentException("Invalid type");
         }
+    }
+
+    @Override
+    public void createTestDocument(String icp) {
+        DocumentDto dto = generateTestValue.generateRandomUser().getDocuments().get(0);
+        dto.setIcp(icp);
+        kafkaMessageSender.sendMessage(dto);
+        log.info("Create Document with icp:{}", dto.getIcp());
     }
 }
