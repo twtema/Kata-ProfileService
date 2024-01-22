@@ -3,6 +3,7 @@ package org.kata.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.kata.config.UrlProperties;
 import org.kata.dto.DocumentDto;
+import org.kata.dto.IndividualDto;
 import org.kata.exception.DocumentsNotFoundException;
 import org.kata.service.DocumentService;
 import org.kata.service.GenerateTestValue;
@@ -49,9 +50,10 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public void createTestDocument(String icp) {
-        DocumentDto dto = generateTestValue.generateRandomUser().getDocuments().get(0);
-        dto.setIcp(icp);
-        kafkaMessageSender.sendMessage(dto);
-        log.info("Create Document with icp:{}", dto.getIcp());
+        IndividualDto individualDto = generateTestValue.generateRandomUser();
+        DocumentDto documentDto = individualDto.getDocuments().get(0);
+        documentDto.setIcp(icp);
+        kafkaMessageSender.sendMessage(documentDto);
+        log.info("Create Document with icp:{}", documentDto.getIcp());
     }
 }
