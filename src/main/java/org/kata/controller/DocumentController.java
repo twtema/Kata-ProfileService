@@ -57,7 +57,7 @@ public class DocumentController {
     @Operation(summary = "Деактивация актуального документа",
                description = "Деактивирует актуальный документ если более новый есть в топике Kafka")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",
+            @ApiResponse(responseCode = "201",
                     description = "Successful Document creation",
                     content = @Content(
                             mediaType = "Application/JSON",
@@ -67,9 +67,9 @@ public class DocumentController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/updateActualState")
-    public String createTestDocument(@Parameter(description = "Individual icp") @RequestParam String icp) {
+    public ResponseEntity<Void> createTestDocument(@Parameter(description = "Individual icp") @RequestParam String icp) {
         documentService.createTestDocument(icp);
-        return "Success create Document, pls check Kafka and DB";
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
