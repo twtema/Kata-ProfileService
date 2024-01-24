@@ -3,23 +3,24 @@ package org.kata.util;
 
 import org.kata.dto.ContactMediumDto;
 import org.kata.dto.enums.ContactMediumType;
+import org.kata.exception.InvalidPhoneNumberException;
 
 
 import java.util.List;
 
 public class PhoneNumberValidator {
 
-    public static void validatePhoneNumbers(List<ContactMediumDto> contacts) {
-        for (ContactMediumDto contact : contacts) {
-            if (ContactMediumType.PHONE.equals(contact.getType())) {
-                if (!isValidPhoneNumber(contact.getValue())) {
-                    throw new RuntimeException("Invalid phone number");
-                }
-            }
+    public static void validatePhoneNumbers(String phoneNumber) {
+        if (!isValidPhoneNumber(phoneNumber)) {
+            throw new InvalidPhoneNumberException("Invalid phone number");
         }
     }
 
-    public static boolean isValidPhoneNumber(String phoneNumber) {
-        return phoneNumber != null && (phoneNumber.matches("^\\+7|^8\\d{10}$"));
+    private static boolean isValidPhoneNumber(String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.replaceAll("\\D", "").length() != 11) {
+            return false;
+        }
+
+        return phoneNumber.matches("^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$");
     }
 }
