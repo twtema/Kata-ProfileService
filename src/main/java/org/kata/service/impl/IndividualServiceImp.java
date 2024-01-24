@@ -3,6 +3,7 @@ package org.kata.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.kata.config.UrlProperties;
 import org.kata.dto.*;
+import org.kata.dto.enums.ContactMediumType;
 import org.kata.dto.enums.EventType;
 import org.kata.exception.IndividualMergeException;
 import org.kata.exception.IndividualNotFoundException;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.stream.IntStream;
 
 import static org.kata.dto.enums.EventType.DEDUPLICATION;
@@ -229,11 +231,19 @@ public class IndividualServiceImp implements IndividualService {
         IntStream.range(0, n)
                 .forEach(i -> {
                     var dto = generateTestValue.generateRandomUser();
-                    PhoneNumberValidator.validatePhoneNumbers(dto.getContacts());
+                    validatePhoneContacts(dto.getContacts());
 
                     kafkaMessageSender.sendMessage(dto);
                     log.info("Create Individual with icp:{}", dto.getIcp());
                 });
+    }
+
+    private void validatePhoneContacts(List<ContactMediumDto> contacts) {
+        for (ContactMediumDto contact : contacts) {
+            if (ContactMediumType.PHONE.equals(contact.getType())) {
+                PhoneNumberValidator.validatePhoneNumbers(contact.getValue());
+            }
+        }
     }
 
     private String printException(String icp) {
