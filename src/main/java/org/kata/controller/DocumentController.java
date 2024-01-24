@@ -45,9 +45,31 @@ public class DocumentController {
                     )
             )
     })
-    @GetMapping("/getAll")
-    public ResponseEntity<List<DocumentDto>> getDocument(@RequestParam String icp) {
-        return new ResponseEntity<>(documentService.getAllDocuments(icp), HttpStatus.OK);
+    @GetMapping
+    public ResponseEntity<List<DocumentDto>> getDocument(String id,
+                                                         @RequestParam(required = false) String type) {
+        if (type == null) {
+            return new ResponseEntity<>(documentService.getAllDocuments(id), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(documentService.getAllDocuments(id, type), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Деактивация актуального документа",
+               description = "Деактивирует актуальный документ если более новый есть в топике Kafka")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201",
+                    description = "Successful Document creation",
+                    content = @Content(
+                            mediaType = "Application/JSON",
+                            schema = @Schema(implementation = String.class)
+                    )),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/updateActualState")
+    public ResponseEntity<Void> createTestDocument(@Parameter(description = "Individual icp") @RequestParam String icp) {
+        documentService.createTestDocument(icp);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Operation(summary = "Деактивация актуального документа",

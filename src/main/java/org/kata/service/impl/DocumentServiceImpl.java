@@ -5,6 +5,7 @@ import org.kata.config.UrlProperties;
 import org.kata.dto.DocumentDto;
 import org.kata.dto.IndividualDto;
 import org.kata.exception.DocumentsNotFoundException;
+import org.kata.exception.IndividualNotFoundException;
 import org.kata.service.DocumentService;
 import org.kata.service.GenerateTestValue;
 import org.kata.service.KafkaMessageSender;
@@ -31,21 +32,62 @@ public class DocumentServiceImpl implements DocumentService {
         this.generateTestValue = generateTestValue;
     }
 
+    @Override
     public List<DocumentDto> getAllDocuments(String icp) {
-        return loaderWebClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(urlProperties.getProfileLoaderGetAllDocuments())
-                        .queryParam("icp", icp)
-                        .build())
-                .retrieve()
-                .onStatus(HttpStatus::isError, response ->
-                        Mono.error(new DocumentsNotFoundException(
-                                "Documents with icp " + icp + " not found")
-                        )
-                )
-                .bodyToMono(new ParameterizedTypeReference<List<DocumentDto>>() {
-                })
-                .block();
+        if (icp != null) {
+            return loaderWebClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(urlProperties.getProfileLoaderGetAllDocuments())
+                            .queryParam("id", icp)
+                            .build())
+                    .retrieve()
+                    .onStatus(HttpStatus::isError, response ->
+                            Mono.error(new DocumentsNotFoundException(
+                                    "Documents with icp " + icp + " not found")
+                            )
+                    )
+                    .bodyToMono(new ParameterizedTypeReference<List<DocumentDto>>() {
+                    })
+                    .block();
+        } else {
+            throw new IndividualNotFoundException("Not found individual");
+        }
+    }
+    @Override
+    public List<DocumentDto> getAllDocuments(String icp, String type) {
+        if (icp == null && type == null) {
+            throw new IllegalArgumentException("Not found parameters");
+        }
+        if (type.equals("uuid")) {
+            return loaderWebClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(urlProperties.getProfileLoaderGetAllDocuments())
+                            .queryParam("id", icp)
+                            .queryParam("type", type)
+                            .build())
+                    .retrieve()
+                    .onStatus(HttpStatus::isError, response ->
+                            Mono.error(new DocumentsNotFoundException(
+                                    "Documents with icp " + icp + " not found")
+                            )
+                    )
+                    .bodyToMono(new ParameterizedTypeReference<List<DocumentDto>>() {
+                    })
+                    .block();
+        } else if (type.isEmpty()) {
+            return getAllDocuments(icp);
+        } else {
+            throw new IllegalArgumentException("Invalid type");
+        }
+    }
+
+    @Override
+    public void createTestDocument(String icp) {
+        IndividualDto individualDto = generateTestValue.generateRandomUser();
+        DocumentDto documentDto = individualDto.getDocuments().get(0);
+        documentDto.setIcp(icp);
+        kafkaMessageSender.sendMessage(documentDto);
+        log.info("Create Document with icp:{}", documentDto.getIcp());
     }
 
     @Override
