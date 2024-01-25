@@ -1,6 +1,6 @@
 package org.kata.dto.enums;
 
-public enum ContactMediumUsage {
+public enum ContactMediumUsageType {
     PERSONAL,
 
     BUSINESS
