@@ -9,12 +9,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.kata.dto.ContactMediumDto;
+import org.kata.dto.RequestContactMediumDto;
 import org.kata.exception.ContactMediumNotFoundException;
 import org.kata.service.ContactMediumService;
 import org.springdoc.api.ErrorMessage;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -46,17 +52,8 @@ public class ContactMediumController {
             )
     })
     @GetMapping
-    public ResponseEntity<List<ContactMediumDto>> getContactMedium(String id,
-                                                                   @RequestParam(required = false) String type,
-                                                                   @RequestParam(required = false) String usage) {
-        if (type == null && usage == null) {
-            return new ResponseEntity<>(contactMediumService.getActualContactMedium(id), HttpStatus.OK);
-        } else if (type != null && usage == null) {
-            return new ResponseEntity<>(contactMediumService.getActualContactMediumByType(id, type), HttpStatus.OK);
-        } else if (usage != null && type == null) {
-            return new ResponseEntity<>(contactMediumService.getActualContactMediumByUsage(id, usage), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(contactMediumService.getActualContactMediumByTypeAndUsage(id, type, usage), HttpStatus.OK);
+    public ResponseEntity<List<ContactMediumDto>> getContactMedium(@ParameterObject RequestContactMediumDto dto) {
+        return new ResponseEntity<>(contactMediumService.getActualContactMedium(dto), HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
