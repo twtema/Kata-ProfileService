@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
 public class UrlProperties {
 
     private String profileLoaderBaseUrl;
-
     private String profileLoaderGetIndividual;
     private String profileLoaderGetAllDocuments;
     private String profileLoaderPostDocument;
     private String profileLoaderGetContactMedium;
     private String profileLoaderGetAvatar;
     private String profileLoaderGetAddress;
+    private String profileLoaderGetWallets;
     private String profileLoaderGetIndividualByPhoneNumber;
     private String ProfileLoaderDeleteIndividual;
     private String ProfileLoaderUpdateIndividual;
