@@ -15,9 +15,9 @@ public class RequestContactMediumDto {
     @Parameter(description = "ICP", required = true)
     private String icp;
 
-    @Parameter(description = "ContactMedium Type", required = false)
+    @Parameter(description = "ContactMedium Type")
     private String type;
 
-    @Parameter(description = "ContactMedium Usage Type", required = false)
+    @Parameter(description = "ContactMedium Usage Type")
     private String usage;
 }
