@@ -1,6 +1,7 @@
 package org.kata.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -51,6 +52,24 @@ public class DocumentController {
             return new ResponseEntity<>(documentService.getAllDocuments(id), HttpStatus.OK);
         }
         return new ResponseEntity<>(documentService.getAllDocuments(id, type), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Деактивация актуального документа",
+               description = "Деактивирует актуальный документ если более новый есть в топике Kafka")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201",
+                    description = "Successful Document creation",
+                    content = @Content(
+                            mediaType = "Application/JSON",
+                            schema = @Schema(implementation = String.class)
+                    )),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/updateActualState")
+    public ResponseEntity<Void> createTestDocument(@Parameter(description = "Individual icp") @RequestParam String icp) {
+        documentService.createTestDocument(icp);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
