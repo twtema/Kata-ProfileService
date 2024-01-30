@@ -19,8 +19,11 @@ public class KafkaMessageSender {
     @Value("${kafka.topic.create2}")
     private String kafkaTopic2;
 
+    @Value("${messageId}")
+    private String messageId;
+
     public void sendMessage(IndividualDto dto) {
-        kafkaTemplate.send(kafkaTopic, dto);
+        kafkaTemplate.send(kafkaTopic, messageId, dto);
         log.info("Message send to topic:{}", kafkaTopic);
     }
 
