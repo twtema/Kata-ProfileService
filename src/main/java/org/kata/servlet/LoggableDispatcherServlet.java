@@ -14,7 +14,7 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
 
     @Override
     protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        filterChain.doFilter(request, response);
         super.doDispatch(request, response);
+        filterChain.doFilter(request, response);
     }
 }
