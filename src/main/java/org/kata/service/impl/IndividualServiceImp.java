@@ -41,7 +41,7 @@ public class IndividualServiceImp implements IndividualService {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(urlProperties.getProfileLoaderGetIndividual())
-                            .queryParam("id", icp)
+                            .queryParam("icp", icp)
                             .build())
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
@@ -66,7 +66,7 @@ public class IndividualServiceImp implements IndividualService {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(urlProperties.getProfileLoaderGetIndividual())
-                            .queryParam("id", icp)
+                            .queryParam("icp", icp)
                             .queryParam("type", type)
                             .build())
                     .retrieve()
