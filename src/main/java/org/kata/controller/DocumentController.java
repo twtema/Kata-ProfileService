@@ -46,16 +46,18 @@ public class DocumentController {
             )
     })
     @GetMapping
-    public ResponseEntity<List<DocumentDto>> getDocument(String id,
-                                                         @RequestParam(required = false) String type) {
+    public ResponseEntity<List<DocumentDto>> getDocument(
+            @RequestHeader(value = "conversationId", required = false) String conversationId,
+            String id,
+            @RequestParam(required = false) String type) {
         if (type == null) {
-            return new ResponseEntity<>(documentService.getAllDocuments(id), HttpStatus.OK);
+            return new ResponseEntity<>(documentService.getAllDocuments(id, conversationId), HttpStatus.OK);
         }
-        return new ResponseEntity<>(documentService.getAllDocuments(id, type), HttpStatus.OK);
+        return new ResponseEntity<>(documentService.getAllDocuments(id, type, conversationId), HttpStatus.OK);
     }
 
     @Operation(summary = "Деактивация актуального документа",
-               description = "Деактивирует актуальный документ если более новый есть в топике Kafka")
+            description = "Деактивирует актуальный документ если более новый есть в топике Kafka")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201",
                     description = "Successful Document creation",
@@ -67,8 +69,10 @@ public class DocumentController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/updateActualState")
-    public ResponseEntity<Void> createTestDocument(@Parameter(description = "Individual icp") @RequestParam String icp) {
-        documentService.createTestDocument(icp);
+    public ResponseEntity<Void> createTestDocument(
+            @RequestHeader(value = "conversationId", required = false) String conversationId,
+            @Parameter(description = "Individual icp") @RequestParam String icp) {
+        documentService.createTestDocument(icp, conversationId);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

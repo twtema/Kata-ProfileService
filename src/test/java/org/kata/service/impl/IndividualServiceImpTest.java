@@ -42,8 +42,8 @@ public class IndividualServiceImpTest {
         ObjectMapper mapper = new ObjectMapper();
 
         //тест
-        Assert.assertThrows(IndividualNotFoundException.class, () -> individualService.getIndividual("200"));
-        Assert.assertThrows(IndividualNotFoundException.class, () -> individualService.getIndividual("546-897"));
+        Assert.assertThrows(IndividualNotFoundException.class, () -> individualService.getIndividual("200", "testDeduplication"));
+        Assert.assertThrows(IndividualNotFoundException.class, () -> individualService.getIndividual("546-897", "testDeduplication"));
 
 
         // создание 1 клиента
@@ -51,32 +51,32 @@ public class IndividualServiceImpTest {
         String content = FileUtils.readFileToString(file1, "UTF-8");
         IndividualDto dto1 = mapper.readValue(content, IndividualDto.class);
         log.info("Cчитали с файла клиент 1 - " + dto1);
-        individualService.updateIndividual(dto1);
+        individualService.updateIndividual(dto1, "testDeduplication");
         // Тест на правильнсть Имени
-        Assert.assertEquals("Valentin11", individualService.getIndividual("100").getName());
+        Assert.assertEquals("Valentin11", individualService.getIndividual("100", "testDeduplication").getName());
         // Тест на ошибку
-        Assert.assertThrows(IndividualNotFoundException.class, () -> individualService.getIndividual("200"));
+        Assert.assertThrows(IndividualNotFoundException.class, () -> individualService.getIndividual("200", "testDeduplication"));
 
         // создание 2 клиента
         File file2 = new File("src/test/java/org/kata/service/impl/ind2.json");
         content = FileUtils.readFileToString(file2, "UTF-8");
         IndividualDto dto2 = mapper.readValue(content, IndividualDto.class);
         log.info("Cчитали с файла клиент 2- " + dto2);
-        individualService.updateIndividual(dto2);
+        individualService.updateIndividual(dto2, "testDeduplication");
         // Тест на правильнсть Имени
-        Assert.assertEquals("Valentin11", individualService.getIndividual("200").getName());
+        Assert.assertEquals("Valentin11", individualService.getIndividual("200", "testDeduplication").getName());
         // Тест на ошибку
         Assert.assertThrows(IndividualNotFoundException.class, () -> individualService
-                .getIndividual("300"));
+                .getIndividual("300", "testDeduplication"));
 
         // слияние клиентов
         Assert.assertEquals("Bobby",
-                individualService.dedublication("100", "200", EventType.DEDUPLICATION)
+                individualService.dedublication("100", "200", EventType.DEDUPLICATION, "testDeduplication")
                         .getPatronymic());
-        log.info("Cделали слияние - " + individualService.getIndividual("100"));
+        log.info("Cделали слияние - " + individualService.getIndividual("100", "testDeduplication"));
 
-        Assert.assertThrows(IndividualNotFoundException.class, () -> individualService.getIndividual("200"));
+        Assert.assertThrows(IndividualNotFoundException.class, () -> individualService.getIndividual("200", "testDeduplication"));
         // удаляем смерженный обьект
-        individualService.deleteIndividual("100");
+        individualService.deleteIndividual("100", "test");
     }
 }

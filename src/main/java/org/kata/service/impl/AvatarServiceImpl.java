@@ -22,13 +22,14 @@ public class AvatarServiceImpl implements AvatarService {
         this.loaderWebClient = WebClient.create(urlProperties.getProfileLoaderBaseUrl());
     }
 
-    public AvatarDto getActualAvatar(String icp) {
+    public AvatarDto getActualAvatar(String icp, String conversationId) {
         if (icp != null) {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(urlProperties.getProfileLoaderGetAvatar())
                             .queryParam("id", icp)
                             .build())
+                    .header("conversationId", conversationId)
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
                             Mono.error(new AvatarNotFoundException(
@@ -43,7 +44,7 @@ public class AvatarServiceImpl implements AvatarService {
     }
 
     @Override
-    public AvatarDto getActualAvatar(String icp, String type) {
+    public AvatarDto getActualAvatar(String icp, String type, String conversationId) {
         if (icp == null && type == null) {
             throw new IllegalArgumentException("Not found parameters");
         }
@@ -54,6 +55,7 @@ public class AvatarServiceImpl implements AvatarService {
                             .queryParam("id", icp)
                             .queryParam("type", type)
                             .build())
+                    .header("conversationId", conversationId)
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
                             Mono.error(new AvatarNotFoundException(
@@ -64,7 +66,7 @@ public class AvatarServiceImpl implements AvatarService {
                     .bodyToMono(AvatarDto.class)
                     .block();
         } else if (type.isEmpty()) {
-            return getActualAvatar(icp);
+            return getActualAvatar(icp, conversationId);
         } else {
             throw new IllegalArgumentException("Invalid type");
         }

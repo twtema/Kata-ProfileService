@@ -36,13 +36,14 @@ public class IndividualServiceImp implements IndividualService {
         this.loaderWebClient = WebClient.create(urlProperties.getProfileLoaderBaseUrl());
     }
 
-    public IndividualDto getIndividual(String icp) {
+    public IndividualDto getIndividual(String icp, String conversationId) {
         if (icp != null) {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(urlProperties.getProfileLoaderGetIndividual())
-                            .queryParam("icp", icp)
+                            .queryParam("id", icp)
                             .build())
+                    .header("conversationId", conversationId)
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
                             Mono.error(new IndividualNotFoundException(
@@ -58,7 +59,7 @@ public class IndividualServiceImp implements IndividualService {
     }
 
     @Override
-    public IndividualDto getIndividual(String icp, String type) {
+    public IndividualDto getIndividual(String icp, String type, String conversationId) {
         if (icp == null && type == null) {
             throw new IllegalArgumentException("Not found parameters");
         }
@@ -66,9 +67,10 @@ public class IndividualServiceImp implements IndividualService {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(urlProperties.getProfileLoaderGetIndividual())
-                            .queryParam("icp", icp)
+                            .queryParam("id", icp)
                             .queryParam("type", type)
                             .build())
+                    .header("conversationId", conversationId)
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
                             Mono.error(new IndividualNotFoundException(
@@ -78,7 +80,7 @@ public class IndividualServiceImp implements IndividualService {
                     .bodyToMono(IndividualDto.class)
                     .block();
         } else if (type.isEmpty()) {
-            return getIndividual(icp);
+            return getIndividual(icp, conversationId);
         } else {
             throw new IllegalArgumentException("Invalid type");
         }
@@ -92,12 +94,12 @@ public class IndividualServiceImp implements IndividualService {
      * @return An object with the data of the first client after the merge.
      */
     @Override
-    public IndividualDto dedublication(String icporigin, String icpdedublication, EventType eventType) {
+    public IndividualDto dedublication(String icporigin, String icpdedublication, EventType eventType, String conversationId) {
         // Retrieve data of the first client
-        IndividualDto original = getIndividual(icporigin);
+        IndividualDto original = getIndividual(icporigin, conversationId);
 
         // Retrieve data of the second client
-        IndividualDto dedublication = getIndividual(icpdedublication);
+        IndividualDto dedublication = getIndividual(icpdedublication, conversationId);
 
         if (eventType.equals(DEDUPLICATION)) {
             log.info("EventType -DEDUPLICATION");
@@ -108,11 +110,11 @@ public class IndividualServiceImp implements IndividualService {
                 IndividualDto mergedDto = dedublicatData(mergedIndividual(original, dedublication));
 
                 // Delete old client records
-                deleteIndividual(icporigin);
-                deleteIndividual(icpdedublication);
+                deleteIndividual(icporigin, conversationId);
+                deleteIndividual(icpdedublication, conversationId);
 
                 // Create a new record with the merged client data
-                updateIndividual(mergedDto);
+                updateIndividual(mergedDto, conversationId);
 
             } else {
                 log.info("Сlient's not identical");
@@ -122,7 +124,7 @@ public class IndividualServiceImp implements IndividualService {
         }
 
         // Return an object with the data of the first client after the merge
-        return getIndividual(icporigin);
+        return getIndividual(icporigin, conversationId);
     }
 
     private IndividualDto dedublicatData(IndividualDto individualDto) {
@@ -174,11 +176,12 @@ public class IndividualServiceImp implements IndividualService {
      *
      * @param dto An object with the new client data.
      */
-    protected void updateIndividual(IndividualDto dto) {
+    protected void updateIndividual(IndividualDto dto, String conversationId) {
         loaderWebClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .path(urlProperties.getProfileLoaderPostIndividual())
                         .build())
+                .header("conversationId", conversationId)
                 .body(Mono.just(dto), IndividualDto.class)
                 .retrieve()
                 .onStatus(HttpStatus::isError, response ->
@@ -191,12 +194,13 @@ public class IndividualServiceImp implements IndividualService {
 
 
     @Override
-    public IndividualDto getIndividualByPhoneNumber(String phone) {
+    public IndividualDto getIndividualByPhoneNumber(String phone, String conversationId) {
         return loaderWebClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(urlProperties.getProfileLoaderGetIndividualByPhoneNumber())
                         .queryParam("phone", phone)
                         .build())
+                .header("conversationId", conversationId)
                 .retrieve()
                 .onStatus(HttpStatus::isError, response ->
                         Mono.error(new IndividualNotFoundException(
@@ -212,13 +216,14 @@ public class IndividualServiceImp implements IndividualService {
      *
      * @param icp The identifier of the client.
      */
-    protected void deleteIndividual(String icp) {
+    protected void deleteIndividual(String icp, String conversationId) {
         log.info("delete client, icp - " + icp);
         loaderWebClient.delete()
                 .uri(uriBuilder -> uriBuilder
                         .path(urlProperties.getProfileLoaderDeleteIndividual())
-                        .queryParam("icp", icp)
+                        .queryParam("id", icp)
                         .build())
+                .header("conversationId", conversationId)
                 .retrieve()
                 .onStatus(HttpStatus::isError, response ->
                         Mono.error(new IndividualNotFoundException(

@@ -1,7 +1,6 @@
 package org.kata.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -16,17 +15,32 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Order(value = Ordered.HIGHEST_PRECEDENCE)
+@Order(1)
 @Component
 @WebFilter(filterName = "LoggingFilter", urlPatterns = "/*")
 public class LoggingFilter extends OncePerRequestFilter {
+
+    private static final String CONVERSATION_ID = "conversationID";
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("Request Hash-{}, Method: {}, URI: {}, Headers: {}",
-                request.hashCode(), request.getMethod(), request.getRequestURI(), getHeaders(request));
+
+        String conversationId = request.getHeader(CONVERSATION_ID);
+        String logEntry = CONVERSATION_ID;
+
+        if (conversationId == null) {
+            conversationId = request.toString();
+            logEntry = "request";
+        }
+
+        log.info("{}: {}, Method: {}, URI: {}, Headers: {}",
+                logEntry, conversationId, request.getMethod(), request.getRequestURI(), getHeaders(request));
+        response.addHeader(CONVERSATION_ID, conversationId);
+
         filterChain.doFilter(request, response);
-        log.info("Request hash: {}, Response Status: {}, Content Type: {}, Headers: {}",
-                request.hashCode(), response.getStatus(), response.getContentType(), getHeaders(response));
+
+        log.info("{}: {}, Response Status: {}, Content Type: {}, Headers: {}",
+                logEntry, response.getHeader(CONVERSATION_ID), response.getStatus(), response.getContentType(), getHeaders(response));
     }
 
     private String getHeaders(HttpServletRequest request) {

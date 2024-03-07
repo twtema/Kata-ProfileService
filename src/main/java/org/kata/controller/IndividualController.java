@@ -50,13 +50,15 @@ public class IndividualController {
             )
     })
     @GetMapping
-    public ResponseEntity<IndividualDto> getIndividual(String id,
+    public ResponseEntity<IndividualDto> getIndividual(@RequestHeader(value = "conversationId", required = false) String conversationId,
+                                                       String id,
                                                        @RequestParam(required = false) String type) {
         if (type == null) {
-            return new ResponseEntity<>(individualService.getIndividual(id), HttpStatus.OK);
+            return new ResponseEntity<>(individualService.getIndividual(id, conversationId), HttpStatus.OK);
         }
-        return new ResponseEntity<>(individualService.getIndividual(id, type), HttpStatus.OK);
+        return new ResponseEntity<>(individualService.getIndividual(id, type, conversationId), HttpStatus.OK);
     }
+
     @Operation(
             summary = "Get Individual by ICP or phone number",
             description = "Get Individual Entity by ICP or phone number"
@@ -81,6 +83,7 @@ public class IndividualController {
     })
     @GetMapping("/getIndividualByIcpOrPhone")
     public ResponseEntity<IndividualDto> getIndividualByIcpOrPhone(
+            @RequestHeader(value = "conversationId", required = false) String conversationId,
             @RequestParam(required = false) @Parameter(description = "User icp") String icp,
             @RequestParam(required = false) @Parameter(description = "User phone") String phone
     ) {
@@ -88,25 +91,23 @@ public class IndividualController {
                 (StringUtils.isEmpty(icp) && StringUtils.isEmpty(phone))) {
             throw new BadRequestException("Exactly one of the parameters (icp or phone) must be provided");
         }
-        IndividualDto individual = icpOrPhone(icp, phone);
+        IndividualDto individual = icpOrPhone(icp, phone, conversationId);
         if (individual == null) {
             throw new IndividualNotFoundException("Individual not found: icp = " + icp +
                     " phone = " + phone);
         }
         return ResponseEntity.ok(individual);
     }
-    private IndividualDto icpOrPhone(String icp, String phone) {
+
+    private IndividualDto icpOrPhone(String icp, String phone, String conversationId) {
         IndividualDto individual = null;
         if (StringUtils.isNotEmpty(phone)) {
-            individual = individualService.getIndividualByPhoneNumber(phone);
+            individual = individualService.getIndividualByPhoneNumber(phone, conversationId);
         } else if (StringUtils.isNotEmpty(icp)) {
-            individual = individualService.getIndividual(icp);
+            individual = individualService.getIndividual(icp, conversationId);
         }
         return individual;
     }
-
-
-
 
 
     @Operation(summary = "Create random Individuals by n (count)")
@@ -133,6 +134,7 @@ public class IndividualController {
         individualService.createTestIndividual(n);
         return "Success create " + n + "Individual, pls check Kafka and DB";
     }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IndividualNotFoundException.class)
     public ErrorMessage getIndividualHandler(IndividualNotFoundException e) {
@@ -147,10 +149,11 @@ public class IndividualController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/deduplication")
-    public ResponseEntity<IndividualDto> dedublication(@RequestBody String icporigin,
+    public ResponseEntity<IndividualDto> dedublication(@RequestHeader(value = "conversationId", required = false) String conversationId,
+                                                       @RequestBody String icporigin,
                                                        @RequestBody String icpdedublication,
                                                        @RequestBody EventType eventType) {
         return new ResponseEntity<>(individualService.dedublication
-                (icporigin, icpdedublication, eventType), HttpStatus.OK);
+                (icporigin, icpdedublication, eventType, conversationId), HttpStatus.OK);
     }
 }

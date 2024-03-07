@@ -22,13 +22,14 @@ public class AddressServiceImpl implements AddressService {
         this.loaderWebClient = WebClient.create(urlProperties.getProfileLoaderBaseUrl());
     }
 
-    public AddressDto getActualAddress(String icp) {
+    public AddressDto getActualAddress(String icp, String conversationId) {
         if (icp != null) {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(urlProperties.getProfileLoaderGetAddress())
                             .queryParam("id", icp)
                             .build())
+                    .header("conversationId", conversationId)
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
                             Mono.error(new AddressNotFoundException(
@@ -43,7 +44,7 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public AddressDto getActualAddress(String icp, String type) {
+    public AddressDto getActualAddress(String icp, String type, String conversationId) {
         if (icp == null && type == null) {
             throw new IllegalArgumentException("Not found parameters");
         }
@@ -54,6 +55,7 @@ public class AddressServiceImpl implements AddressService {
                             .queryParam("id", icp)
                             .queryParam("type", type)
                             .build())
+                    .header("conversationId", conversationId)
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
                             Mono.error(new AddressNotFoundException(
@@ -64,7 +66,7 @@ public class AddressServiceImpl implements AddressService {
                     .bodyToMono(AddressDto.class)
                     .block();
         } else if (type.isEmpty()) {
-            return getActualAddress(icp);
+            return getActualAddress(icp, conversationId);
         } else {
             throw new IllegalArgumentException("Invalid type");
         }

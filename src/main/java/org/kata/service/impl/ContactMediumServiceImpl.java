@@ -25,13 +25,14 @@ public class ContactMediumServiceImpl implements ContactMediumService {
         this.loaderWebClient = WebClient.create(urlProperties.getProfileLoaderBaseUrl());
     }
 
-    public List<ContactMediumDto> getActualContactMedium(String icp) {
+    public List<ContactMediumDto> getActualContactMedium(String icp, String conversationId) {
         if (icp != null) {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(urlProperties.getProfileLoaderGetContactMedium())
                             .queryParam("id", icp)
                             .build())
+                    .header("conversationId", conversationId)
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
                             Mono.error(new ContactMediumNotFoundException(
@@ -47,7 +48,7 @@ public class ContactMediumServiceImpl implements ContactMediumService {
     }
 
     @Override
-    public List<ContactMediumDto> getActualContactMedium(String icp, String uuid) {
+    public List<ContactMediumDto> getActualContactMedium(String icp, String uuid, String conversationId) {
         if (icp == null && uuid == null) {
             throw new IllegalArgumentException("Not found parameters");
         }
@@ -58,6 +59,7 @@ public class ContactMediumServiceImpl implements ContactMediumService {
                             .queryParam("id", icp)
                             .queryParam("type", uuid)
                             .build())
+                    .header("conversationId", conversationId)
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
                             Mono.error(new ContactMediumNotFoundException(
@@ -68,7 +70,7 @@ public class ContactMediumServiceImpl implements ContactMediumService {
                     })
                     .block();
         } else if (uuid.isEmpty()) {
-            return getActualContactMedium(icp);
+            return getActualContactMedium(icp, conversationId);
         } else {
             throw new IllegalArgumentException("Invalid type");
         }

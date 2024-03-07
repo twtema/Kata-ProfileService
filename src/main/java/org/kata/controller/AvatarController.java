@@ -43,12 +43,14 @@ public class AvatarController {
             )
     })
     @GetMapping
-    public ResponseEntity<AvatarDto> getAvatar(String id,
-                                               @RequestParam(required = false) String type) {
+    public ResponseEntity<AvatarDto> getAvatar(
+            @RequestHeader(value = "conversationId", required = false) String conversationId,
+            String id,
+            @RequestParam(required = false) String type) {
         if (type == null) {
-            return new ResponseEntity<>(avatarService.getActualAvatar(id), HttpStatus.OK);
+            return new ResponseEntity<>(avatarService.getActualAvatar(id, conversationId), HttpStatus.OK);
         }
-        return new ResponseEntity<>(avatarService.getActualAvatar(id, type), HttpStatus.OK);
+        return new ResponseEntity<>(avatarService.getActualAvatar(id, type, conversationId), HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

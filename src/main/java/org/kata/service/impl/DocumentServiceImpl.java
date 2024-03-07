@@ -33,13 +33,14 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<DocumentDto> getAllDocuments(String icp) {
+    public List<DocumentDto> getAllDocuments(String icp, String conversationId) {
         if (icp != null) {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(urlProperties.getProfileLoaderGetAllDocuments())
                             .queryParam("id", icp)
                             .build())
+                    .header("conversationId", conversationId)
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
                             Mono.error(new DocumentsNotFoundException(
@@ -54,7 +55,7 @@ public class DocumentServiceImpl implements DocumentService {
         }
     }
     @Override
-    public List<DocumentDto> getAllDocuments(String icp, String type) {
+    public List<DocumentDto> getAllDocuments(String icp, String type, String conversationId) {
         if (icp == null && type == null) {
             throw new IllegalArgumentException("Not found parameters");
         }
@@ -65,6 +66,7 @@ public class DocumentServiceImpl implements DocumentService {
                             .queryParam("id", icp)
                             .queryParam("type", type)
                             .build())
+                    .header("conversationId", conversationId)
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
                             Mono.error(new DocumentsNotFoundException(
@@ -75,14 +77,14 @@ public class DocumentServiceImpl implements DocumentService {
                     })
                     .block();
         } else if (type.isEmpty()) {
-            return getAllDocuments(icp);
+            return getAllDocuments(icp, conversationId);
         } else {
             throw new IllegalArgumentException("Invalid type");
         }
     }
 
     @Override
-    public void createTestDocument(String icp) {
+    public void createTestDocument(String icp, String conversationId) {
         IndividualDto individualDto = generateTestValue.generateRandomUser();
         DocumentDto documentDto = individualDto.getDocuments().get(0);
         documentDto.setIcp(icp);
