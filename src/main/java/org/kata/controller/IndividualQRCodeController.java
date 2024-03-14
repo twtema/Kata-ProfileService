@@ -1,6 +1,7 @@
 package org.kata.controller;
 
 import com.google.zxing.WriterException;
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import org.kata.dto.IndividualDto;
 import org.kata.service.IndividualQRCodeService;
@@ -24,6 +25,7 @@ public class IndividualQRCodeController {
 
 
     @GetMapping(value = "/createQRCode", produces = MediaType.IMAGE_PNG_VALUE)
+    @Timed(value = "execution_time", description = "Get generateQRCode")
     public byte[] generateQrCode(@RequestParam String icp) throws IOException, WriterException {
         IndividualDto individualDto = individualService.getIndividual(icp);
 

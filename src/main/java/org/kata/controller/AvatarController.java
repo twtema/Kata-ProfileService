@@ -1,5 +1,6 @@
 package org.kata.controller;
 
+import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -43,6 +44,7 @@ public class AvatarController {
             )
     })
     @GetMapping
+    @Timed(value = "execution_time", description = "Get avatar")
     public ResponseEntity<AvatarDto> getAvatar(String id,
                                                @RequestParam(required = false) String type) {
         if (type == null) {
@@ -53,6 +55,7 @@ public class AvatarController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(AvatarNotFoundException.class)
+    @Timed(value = "execution_time", description = "Get avatar handler")
     public ErrorMessage getAvatarHandler(AvatarNotFoundException e) {
         return new ErrorMessage(e.getMessage());
     }

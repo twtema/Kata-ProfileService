@@ -102,6 +102,14 @@
             <artifactId>pdfbox</artifactId>
             <version>3.0.0</version>
         </dependency>
+
+        <!--        Apects spring-->
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aspects</artifactId>
+            <version>5.2.25.RELEASE</version>
+        </dependency>
     </dependencies>
 
     <build>

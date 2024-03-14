@@ -1,5 +1,6 @@
 package org.kata.controller;
 
+import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -46,6 +47,7 @@ public class DocumentController {
             )
     })
     @GetMapping
+    @Timed(value = "execution_time", description = "Get document")
     public ResponseEntity<List<DocumentDto>> getDocument(String id,
                                                          @RequestParam(required = false) String type) {
         if (type == null) {
@@ -67,6 +69,7 @@ public class DocumentController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/updateActualState")
+    @Timed(value = "execution_time", description = "Create test document")
     public ResponseEntity<Void> createTestDocument(@Parameter(description = "Individual icp") @RequestParam String icp) {
         documentService.createTestDocument(icp);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -74,6 +77,7 @@ public class DocumentController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(DocumentsNotFoundException.class)
+    @Timed(value = "execution_time", description = "Get document handler")
     public ErrorMessage getDocumentHandler(DocumentsNotFoundException e) {
         return new ErrorMessage(e.getMessage());
     }
