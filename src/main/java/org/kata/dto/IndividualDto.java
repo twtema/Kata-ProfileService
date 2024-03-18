@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.jackson.Jacksonized;
 import org.kata.dto.enums.GenderType;
 
@@ -13,10 +15,15 @@ import java.util.List;
 @Data
 @Builder
 @Jacksonized
+@Getter
+@Setter
 public class IndividualDto {
 
     @Schema(description = "ICP", example = "1234567890")
     private String icp;
+
+    @Schema(description = "uuid", example = "1234567890")
+    private String uuid;
 
     @Schema(description = "Имя", example = "Иван")
     private String name;
@@ -63,5 +70,13 @@ public class IndividualDto {
 
     @Schema(description = "Кошельки")
     private List<WalletDto> wallet;
+
+
+    private boolean archived;
+
+    private String status;
+
+    private String linkedClientUUID;
+
 }
 

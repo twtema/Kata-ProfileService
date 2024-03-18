@@ -29,6 +29,7 @@ public class AddressServiceImpl implements AddressService {
                             .path(urlProperties.getProfileLoaderGetAddress())
                             .queryParam("id", icp)
                             .build())
+                    .header("icp", icp)
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
                             Mono.error(new AddressNotFoundException(
@@ -54,6 +55,7 @@ public class AddressServiceImpl implements AddressService {
                             .queryParam("id", icp)
                             .queryParam("type", type)
                             .build())
+                    .header("icp", icp)
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
                             Mono.error(new AddressNotFoundException(

@@ -30,6 +30,7 @@ public class IndividualController {
     private final IndividualService individualService;
     private final IndividualQRCodeService individualQRCodeService;
 
+
     @Operation(summary = "Get the Individual")
     @ApiResponses(value = {
             @ApiResponse(

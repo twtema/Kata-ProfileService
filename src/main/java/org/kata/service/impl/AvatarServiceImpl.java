@@ -29,6 +29,7 @@ public class AvatarServiceImpl implements AvatarService {
                             .path(urlProperties.getProfileLoaderGetAvatar())
                             .queryParam("id", icp)
                             .build())
+                    .header("icp", icp)
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
                             Mono.error(new AvatarNotFoundException(
