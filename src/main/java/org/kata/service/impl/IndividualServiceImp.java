@@ -10,11 +10,14 @@ import org.kata.exception.IndividualNotFoundException;
 import org.kata.service.GenerateTestValue;
 import org.kata.service.IndividualService;
 import org.kata.service.KafkaMessageSender;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.kata.dto.enums.EventType.DEDUPLICATION;
@@ -37,12 +40,14 @@ public class IndividualServiceImp implements IndividualService {
     }
 
     public IndividualDto getIndividual(String icp) {
+
         if (icp != null) {
             return loaderWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(urlProperties.getProfileLoaderGetIndividual())
                             .queryParam("icp", icp)
                             .build())
+                    .header("icp", icp)
                     .retrieve()
                     .onStatus(HttpStatus::isError, response ->
                             Mono.error(new IndividualNotFoundException(
@@ -91,75 +96,106 @@ public class IndividualServiceImp implements IndividualService {
      * @param eventType        The identifier of the merge event.
      * @return An object with the data of the first client after the merge.
      */
+
+
     @Override
     public IndividualDto dedublication(String icporigin, String icpdedublication, EventType eventType) {
-        // Retrieve data of the first client
+        // Получаем данные первого клиента
         IndividualDto original = getIndividual(icporigin);
 
-        // Retrieve data of the second client
-        IndividualDto dedublication = getIndividual(icpdedublication);
+        // Получаем данные второго клиента
+        IndividualDto duplicate = getIndividual(icpdedublication);
 
-        if (eventType.equals(DEDUPLICATION)) {
-            log.info("EventType -DEDUPLICATION");
+        // Проверяем, является ли eventType DEDUPLICATION
+        if (eventType == EventType.DEDUPLICATION) {
+            log.info("Событие - ДЕДУПЛИКАЦИЯ");
 
-            if (isIdentical(original, dedublication)) {
-                log.info("Сlient's identical");
-                // Create a new object for merging the client data
-                IndividualDto mergedDto = dedublicatData(mergedIndividual(original, dedublication));
+            // Проверяем существование обоих клиентов
+            if (original != null && duplicate != null) {
 
-                // Delete old client records
-                deleteIndividual(icporigin);
-                deleteIndividual(icpdedublication);
+                // Проверяем, не являются ли оба клиента архивными
+                if (!original.isArchived() && !duplicate.isArchived()) {
 
-                // Create a new record with the merged client data
-                updateIndividual(mergedDto);
+                    // Проверяем, идентичны ли клиенты
+                    if (isIdentical(original, duplicate)) {
+                        log.info("Клиенты идентичны");
 
+                        // Удаляем дублирующиеся данные у второго клиента
+                        removeDuplicateData(duplicate);
+
+                        // Архивируем второго клиента
+                        duplicate.setArchived(true);
+                        duplicate.setStatus("archiveClient");
+
+                        // Связываем первого клиента с архивным дубликатом
+                        duplicate.setLinkedClientUUID(original.getUuid());
+
+                        // Обновляем базу данных
+                        updateIndividual(duplicate);
+                        updateIndividual(original);
+
+                        log.info("Дедубликация успешно завершена");
+
+                        // Возвращаем обновленные данные первого клиента
+                        return original;
+                    } else {
+                        log.info("Клиенты не идентичны");
+                        // Клиенты не идентичны, дедубликация невозможна
+                        throw new IllegalStateException("Дедубликация невозможна: Клиенты не идентичны.");
+                    }
+                } else {
+                    log.info("Один или оба клиента уже архивированы");
+                    // Один или оба клиента уже архивированы, дедубликация невозможна
+                    throw new IllegalStateException("Дедубликация невозможна: Один или оба клиента уже архивированы.");
+                }
             } else {
-                log.info("Сlient's not identical");
+                log.info("Один или оба клиента не найдены");
+                // Один или оба клиента не найдены, дедубликация невозможна
+                throw new IllegalStateException("Дедубликация невозможна: Один или оба клиента не найдены.");
             }
         } else {
-            log.info("EventsType is not DEDUPLICATION");
+            log.info("Событие не является ДЕДУПЛИКАЦИЕЙ");
+            // Событие не является DEDUPLICATION, дедубликация невозможна
+            throw new IllegalArgumentException("Дедубликация невозможна: Событие не является ДЕДУПЛИКАЦИЕЙ.");
         }
-
-        // Return an object with the data of the first client after the merge
-        return getIndividual(icporigin);
-    }
-
-    private IndividualDto dedublicatData(IndividualDto individualDto) {
-
-        try {
-            // Remove duplicate data
-            individualDto.setAddress(individualDto.getAddress().stream().distinct().toList());
-            individualDto.setAvatar(individualDto.getAvatar().stream().distinct().toList());
-            individualDto.setDocuments(individualDto.getDocuments().stream().distinct().toList());
-            individualDto.setContacts(individualDto.getContacts().stream().distinct().toList());
-            log.info("client removed duplicate data");
-
-        }  catch (NullPointerException e) {
-
-            throw new IndividualMergeException(printException(individualDto.getIcp()) + " not merged");
-        }
-
-        return  individualDto;
     }
 
     /**
-     * Checks if two individual clients are identical based on their personal information.
+     * Удаляет дублирующиеся данные у индивидуального клиента.
      *
-     * @param original the first individual client
-     * @param dedublication the second individual client
-     * @return true if the clients are identical, false otherwise
+     * @param individualDto индивидуальный клиент
      */
-    private boolean isIdentical(IndividualDto original, IndividualDto dedublication) {
-        return getIdentical(original).equals(getIdentical(dedublication));
+    private void removeDuplicateData(IndividualDto individualDto) {
+        // Удаляем дублирующиеся поля данных
+
+        individualDto.setAddress(individualDto.getAddress().stream().distinct().toList());
+        individualDto.setAvatar(individualDto.getAvatar().stream().distinct().toList());
+        individualDto.setDocuments(individualDto.getDocuments().stream().distinct().toList());
+        individualDto.setContacts(individualDto.getContacts().stream().distinct().toList());
+
+        log.info("Дублирующиеся данные удалены у клиента");
     }
 
     /**
-     * Creates an instance of IdenticalIndividualDto based on the personal information of an individual client.
+     * Удаляет дубликаты из списка.
      *
-     * @param individualDto the individual client
-     * @return an instance of IdenticalIndividualDto
+     * @param list список для удаления дубликатов
+     * @return список без дубликатов
      */
+    private List<String> removeDuplicates(List<String> list) {
+        return list.stream().distinct().collect(Collectors.toList());
+    }
+
+    /**
+     * Проверяет, являются ли два индивидуальных клиента идентичными на основе их персональной информации.
+     *
+     * @param original   первый индивидуальный клиент
+     * @param duplicate второй индивидуальный клиент
+     * @return true, если клиенты идентичны, иначе false
+     */
+    private boolean isIdentical(IndividualDto original, IndividualDto duplicate) {
+        return getIdentical(original).equals(getIdentical(duplicate));
+    }
     private IdenticalIndividualDto getIdentical(IndividualDto individualDto) {
         IdenticalIndividualDto dto = new IdenticalIndividualDto();
         dto.setName(individualDto.getName());
