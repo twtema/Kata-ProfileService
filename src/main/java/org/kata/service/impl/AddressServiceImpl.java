@@ -1,5 +1,6 @@
 package org.kata.service.impl;
 
+import io.micrometer.core.annotation.Timed;
 import lombok.extern.slf4j.Slf4j;
 import org.kata.config.UrlProperties;
 import org.kata.dto.AddressDto;
@@ -22,6 +23,7 @@ public class AddressServiceImpl implements AddressService {
         this.loaderWebClient = WebClient.create(urlProperties.getProfileLoaderBaseUrl());
     }
 
+//    @Timed(value = "execution_time", description = "Get actual address")
     public AddressDto getActualAddress(String icp) {
         if (icp != null) {
             return loaderWebClient.get()

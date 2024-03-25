@@ -1,5 +1,6 @@
 package org.kata.controller;
 
+import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -51,6 +52,7 @@ public class IndividualController {
             )
     })
     @GetMapping
+    @Timed(value = "execution_time", description = "Get individual")
     public ResponseEntity<IndividualDto> getIndividual(String id,
                                                        @RequestParam(required = false) String type) {
         if (type == null) {
@@ -81,6 +83,7 @@ public class IndividualController {
             )
     })
     @GetMapping("/getIndividualByIcpOrPhone")
+    @Timed(value = "execution_time", description = "Get individual by icp or phone")
     public ResponseEntity<IndividualDto> getIndividualByIcpOrPhone(
             @RequestParam(required = false) @Parameter(description = "User icp") String icp,
             @RequestParam(required = false) @Parameter(description = "User phone") String phone
@@ -96,6 +99,8 @@ public class IndividualController {
         }
         return ResponseEntity.ok(individual);
     }
+
+    @Timed(value = "execution_time", description = "Get individual by icp or phone_2")
     private IndividualDto icpOrPhone(String icp, String phone) {
         IndividualDto individual = null;
         if (StringUtils.isNotEmpty(phone)) {
@@ -130,12 +135,14 @@ public class IndividualController {
             )
     })
     @PostMapping
+    @Timed(value = "execution_time", description = "Create test individual")
     public String createTestIndividual(@RequestParam int n) {
         individualService.createTestIndividual(n);
         return "Success create " + n + "Individual, pls check Kafka and DB";
     }
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IndividualNotFoundException.class)
+    @Timed(value = "execution_time", description = "Get individual handler")
     public ErrorMessage getIndividualHandler(IndividualNotFoundException e) {
         return new ErrorMessage(e.getMessage());
     }
@@ -148,6 +155,7 @@ public class IndividualController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/deduplication")
+    @Timed(value = "execution_time", description = "Deduplication individual method")
     public ResponseEntity<IndividualDto> dedublication(@RequestBody String icporigin,
                                                        @RequestBody String icpdedublication,
                                                        @RequestBody EventType eventType) {

@@ -1,5 +1,6 @@
 package org.kata.controller;
 
+import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -42,6 +43,7 @@ public class AddressController {
             )
     })
     @GetMapping
+    @Timed(value = "execution_time", description = "Get actual address")
     public ResponseEntity<AddressDto> getAddress(String id,
                                                  @RequestParam(required = false) String type) {
         if (type == null) {
@@ -52,6 +54,7 @@ public class AddressController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(AddressNotFoundException.class)
+    @Timed(value = "execution_time", description = "Get address handler")
     public ErrorMessage getAddressHandler(AddressNotFoundException e) {
         return new ErrorMessage(e.getMessage());
     }

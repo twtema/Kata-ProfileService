@@ -1,5 +1,6 @@
 package org.kata.controller;
 
+import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -46,6 +47,7 @@ public class ContactMediumController {
             )
     })
     @GetMapping
+    @Timed(value = "execution_time", description = "Get contact medium")
     public ResponseEntity<List<ContactMediumDto>> getContactMedium(String id,
                                                                    @RequestParam(required = false) String type) {
         if (type == null) {
@@ -56,6 +58,7 @@ public class ContactMediumController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ContactMediumNotFoundException.class)
+    @Timed(value = "execution_time", description = "Get contact medium handler")
     public ErrorMessage getContactMediumHandler(ContactMediumNotFoundException e) {
         return new ErrorMessage(e.getMessage());
     }
